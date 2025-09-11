@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peer Support Groups - MindVault</title>
+    <meta name="description" content="Connect with others who understand your journey - Join supportive communities">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        html { scroll-behavior: smooth; }
+        .group-card { transition: all 0.3s ease; }
+        .group-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .message-bubble { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .typing-indicator { animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .online-indicator { animation: pulse 2s ease-in-out infinite; }
+        .dark select, .dark select option { background-color: #374151; color: #f9fafb; border-color: #4b5563; }
+        .dark input[type="text"], .dark input[type="email"], .dark input[type="password"], .dark textarea { background-color: #374151; color: #f9fafb; border-color: #4b5563; }
+        .group-avatar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .member-avatar { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .moderator-avatar { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <img src="assets/mindvault-icon.svg" alt="MindVault" class="h-8 w-8 mr-3">
+                    <span class="text-xl font-bold gradient-text">MindVault</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Dashboard</a>
+                    <a href="share.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Share</a>
+                    <a href="insights.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Insights</a>
+                    <a href="counselor-matching.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Counselors</a>
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg id="sun-icon" class="w-5 h-5 text-yellow-500 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-5 h-5 text-gray-700 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                Peer Support Groups
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Connect with others who understand your journey. Share experiences, find support, 
+                and build meaningful connections in safe, moderated communities.
+            </p>
+        </div>
+
+        <!-- Feature Access Check -->
+        <div id="upgrade-prompt" class="hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-xl mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Peer Support Groups Available</h3>
+                    <p class="text-indigo-100">Upgrade to Premium or Professional to join support groups and connect with peers.</p>
+                </div>
+                <a href="subscription.html" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    Upgrade Now
+                </a>
+            </div>
+        </div>
+
+        <!-- Group Discovery -->
+        <div id="groups-section" class="mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">Discover Groups</h2>
+                <div class="flex space-x-4">
+                    <select id="category-filter" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="">All Categories</option>
+                        <option value="anxiety">Anxiety & Panic</option>
+                        <option value="depression">Depression & Mood</option>
+                        <option value="trauma">Trauma & PTSD</option>
+                        <option value="relationships">Relationships</option>
+                        <option value="grief">Grief & Loss</option>
+                        <option value="addiction">Addiction & Recovery</option>
+                        <option value="eating">Eating Disorders</option>
+                        <option value="work">Work & Career</option>
+                        <option value="family">Family Issues</option>
+                        <option value="lgbtq">LGBTQ+</option>
+                        <option value="chronic-illness">Chronic Illness</option>
+                    </select>
+                    <button id="create-group-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                        Create Group
+                    </button>
+                </div>
+            </div>
+
+            <!-- Groups Grid -->
+            <div id="groups-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Groups will be populated here -->
+            </div>
+        </div>
+
+        <!-- My Groups -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">My Groups</h2>
+            <div id="my-groups" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- User's groups will be populated here -->
+            </div>
+        </div>
+
+        <!-- Group Chat Interface -->
+        <div id="group-chat" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="group-avatar w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                        <span id="group-initial">A</span>
+                    </div>
+                    <div>
+                        <h3 id="group-name" class="text-lg font-semibold text-gray-900 dark:text-white"></h3>
+                        <p id="group-members-count" class="text-sm text-gray-600 dark:text-gray-300"></p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-green-600 dark:text-green-400 font-medium">
+                        <span id="online-count">0</span> online
+                    </span>
+                    <button id="leave-group" class="text-red-500 hover:text-red-700 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="h-96 overflow-y-auto p-6 space-y-4" id="group-messages">
+                <!-- Group messages will appear here -->
+            </div>
+
+            <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center space-x-4">
+                    <input type="text" id="group-message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <button id="send-group-message" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-colors">
+                        Send
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Messages are moderated. Be respectful and supportive to all members.
+                </p>
+            </div>
+        </div>
+
+        <!-- Create Group Modal -->
+        <div id="create-group-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md mx-4">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Create New Group</h3>
+                
+                <form id="create-group-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Group Name</label>
+                        <input type="text" id="group-name-input" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="Enter group name" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                        <select id="group-category-input" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white" required>
+                            <option value="">Select category</option>
+                            <option value="anxiety">Anxiety & Panic</option>
+                            <option value="depression">Depression & Mood</option>
+                            <option value="trauma">Trauma & PTSD</option>
+                            <option value="relationships">Relationships</option>
+                            <option value="grief">Grief & Loss</option>
+                            <option value="addiction">Addiction & Recovery</option>
+                            <option value="eating">Eating Disorders</option>
+                            <option value="work">Work & Career</option>
+                            <option value="family">Family Issues</option>
+                            <option value="lgbtq">LGBTQ+</option>
+                            <option value="chronic-illness">Chronic Illness</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                        <textarea id="group-description-input" class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none" placeholder="Describe your group's purpose and goals" required></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Privacy</label>
+                        <select id="group-privacy-input" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                            <option value="public">Public - Anyone can join</option>
+                            <option value="private">Private - Invite only</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg font-semibold transition-colors">
+                            Create Group
+                        </button>
+                        <button type="button" id="cancel-create-group" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Safety Guidelines -->
+        <div class="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-200">Community Guidelines</h3>
+                    <ul class="mt-2 text-blue-700 dark:text-blue-300 space-y-1">
+                        <li>• Be respectful and supportive to all members</li>
+                        <li>• Share your experiences, but avoid giving medical advice</li>
+                        <li>• Keep discussions confidential and don't share personal information</li>
+                        <li>• Report any inappropriate behavior to moderators</li>
+                        <li>• Remember: this is peer support, not professional therapy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample groups data
+        const groups = [
+            {
+                id: 1,
+                name: "Anxiety Warriors",
+                category: "anxiety",
+                description: "A supportive community for those dealing with anxiety and panic disorders. Share coping strategies and find understanding.",
+                members: 1247,
+                online: 23,
+                privacy: "public",
+                createdBy: "Sarah M.",
+                createdAt: "2023-01-15",
+                lastActivity: "2 minutes ago",
+                rules: ["Be supportive", "No medical advice", "Respect privacy"],
+                tags: ["anxiety", "panic", "coping", "support"]
+            },
+            {
+                id: 2,
+                name: "Depression Support Circle",
+                category: "depression",
+                description: "A safe space for individuals dealing with depression. Share your journey and find hope together.",
+                members: 892,
+                online: 15,
+                privacy: "public",
+                createdBy: "Mike R.",
+                createdAt: "2023-02-20",
+                lastActivity: "5 minutes ago",
+                rules: ["Be kind", "No judgment", "Share experiences"],
+                tags: ["depression", "mood", "support", "hope"]
+            },
+            {
+                id: 3,
+                name: "Trauma Survivors United",
+                category: "trauma",
+                description: "A healing community for trauma survivors. Share your strength and support others on their healing journey.",
+                members: 456,
+                online: 8,
+                privacy: "private",
+                createdBy: "Emma L.",
+                createdAt: "2023-03-10",
+                lastActivity: "1 hour ago",
+                rules: ["Trigger warnings", "Respect boundaries", "No details"],
+                tags: ["trauma", "healing", "survivors", "strength"]
+            },
+            {
+                id: 4,
+                name: "LGBTQ+ Mental Health",
+                category: "lgbtq",
+                description: "A supportive space for LGBTQ+ individuals to discuss mental health challenges and celebrate victories.",
+                members: 678,
+                online: 12,
+                privacy: "public",
+                createdBy: "Alex T.",
+                createdAt: "2023-01-30",
+                lastActivity: "10 minutes ago",
+                rules: ["Inclusive language", "Respect identity", "Safe space"],
+                tags: ["lgbtq", "mental-health", "support", "pride"]
+            },
+            {
+                id: 5,
+                name: "Working Through Grief",
+                category: "grief",
+                description: "A compassionate community for those navigating loss and grief. Find comfort in shared experiences.",
+                members: 334,
+                online: 6,
+                privacy: "public",
+                createdBy: "Jennifer K.",
+                createdAt: "2023-04-05",
+                lastActivity: "30 minutes ago",
+                rules: ["Be gentle", "Share memories", "No timeline"],
+                tags: ["grief", "loss", "healing", "memories"]
+            },
+            {
+                id: 6,
+                name: "Recovery Champions",
+                category: "addiction",
+                description: "A supportive community for those in recovery from addiction. Celebrate milestones and support each other.",
+                members: 567,
+                online: 18,
+                privacy: "public",
+                createdBy: "David P.",
+                createdAt: "2023-02-14",
+                lastActivity: "3 minutes ago",
+                rules: ["No triggers", "Celebrate wins", "Support recovery"],
+                tags: ["recovery", "addiction", "sobriety", "support"]
+            }
+        ];
+
+        let currentGroup = null;
+        let groupMessages = [];
+        let userGroups = []; // Groups the user has joined
+
+        // Check feature access on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!hasFeatureAccess('peer_support')) {
+                document.getElementById('upgrade-prompt').classList.remove('hidden');
+                document.getElementById('groups-section').classList.add('hidden');
+            } else {
+                displayGroups();
+                displayUserGroups();
+            }
+        });
+
+        // Category filter
+        document.getElementById('category-filter').addEventListener('change', function() {
+            displayGroups();
+        });
+
+        // Create group button
+        document.getElementById('create-group-btn').addEventListener('click', function() {
+            document.getElementById('create-group-modal').classList.remove('hidden');
+        });
+
+        // Cancel create group
+        document.getElementById('cancel-create-group').addEventListener('click', function() {
+            document.getElementById('create-group-modal').classList.add('hidden');
+            document.getElementById('create-group-form').reset();
+        });
+
+        // Create group form
+        document.getElementById('create-group-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const groupData = {
+                name: document.getElementById('group-name-input').value,
+                category: document.getElementById('group-category-input').value,
+                description: document.getElementById('group-description-input').value,
+                privacy: document.getElementById('group-privacy-input').value
+            };
+            
+            // Create new group
+            const newGroup = {
+                id: Date.now(),
+                ...groupData,
+                members: 1,
+                online: 1,
+                createdBy: getCurrentUser()?.firstName || 'You',
+                createdAt: new Date().toISOString().split('T')[0],
+                lastActivity: 'Just now',
+                rules: ['Be supportive', 'No medical advice', 'Respect privacy'],
+                tags: [groupData.category, 'support', 'community']
+            };
+            
+            groups.unshift(newGroup);
+            userGroups.push(newGroup.id);
+            
+            // Close modal and refresh display
+            document.getElementById('create-group-modal').classList.add('hidden');
+            document.getElementById('create-group-form').reset();
+            displayGroups();
+            displayUserGroups();
+            
+            alert('Group created successfully!');
+        });
+
+        function displayGroups() {
+            const category = document.getElementById('category-filter').value;
+            const filteredGroups = category ? groups.filter(g => g.category === category) : groups;
+            
+            const grid = document.getElementById('groups-grid');
+            grid.innerHTML = '';
+            
+            filteredGroups.forEach(group => {
+                const card = createGroupCard(group);
+                grid.appendChild(card);
+            });
+        }
+
+        function displayUserGroups() {
+            const myGroupsContainer = document.getElementById('my-groups');
+            myGroupsContainer.innerHTML = '';
+            
+            if (userGroups.length === 0) {
+                myGroupsContainer.innerHTML = `
+                    <div class="col-span-full text-center py-8">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Groups Yet</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Join groups to connect with others who understand your journey.</p>
+                        <button onclick="document.getElementById('create-group-btn').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                            Create Your First Group
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            const userGroupsData = groups.filter(g => userGroups.includes(g.id));
+            userGroupsData.forEach(group => {
+                const card = createGroupCard(group, true);
+                myGroupsContainer.appendChild(card);
+            });
+        }
+
+        function createGroupCard(group, isUserGroup = false) {
+            const card = document.createElement('div');
+            card.className = 'group-card bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700';
+            
+            const groupInitial = group.name.charAt(0).toUpperCase();
+            const isJoined = userGroups.includes(group.id);
+            
+            card.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <div class="group-avatar w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                        ${groupInitial}
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${group.name}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 capitalize">${group.category.replace('-', ' ')}</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-600 dark:text-gray-300">
+                            <span class="text-green-600 dark:text-green-400 font-medium">${group.online}</span> online
+                        </div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">${group.members} members</div>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">${group.description}</p>
+                
+                <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-4">
+                    <span>Created by ${group.createdBy}</span>
+                    <span>${group.lastActivity}</span>
+                </div>
+                
+                <div class="flex space-x-2">
+                    ${isJoined ? `
+                        <button onclick="openGroupChat(${group.id})" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-3 rounded-lg font-semibold transition-colors text-sm">
+                            Open Chat
+                        </button>
+                        <button onclick="leaveGroup(${group.id})" class="px-3 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm">
+                            Leave
+                        </button>
+                    ` : `
+                        <button onclick="joinGroup(${group.id})" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-3 rounded-lg font-semibold transition-colors text-sm">
+                            Join Group
+                        </button>
+                        <button onclick="viewGroupDetails(${group.id})" class="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
+                            Details
+                        </button>
+                    `}
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function joinGroup(groupId) {
+            if (!userGroups.includes(groupId)) {
+                userGroups.push(groupId);
+                const group = groups.find(g => g.id === groupId);
+                group.members += 1;
+                group.online += 1;
+                
+                displayGroups();
+                displayUserGroups();
+                
+                alert(`You've joined ${group.name}!`);
+            }
+        }
+
+        function leaveGroup(groupId) {
+            const index = userGroups.indexOf(groupId);
+            if (index > -1) {
+                userGroups.splice(index, 1);
+                const group = groups.find(g => g.id === groupId);
+                group.members -= 1;
+                group.online -= 1;
+                
+                displayGroups();
+                displayUserGroups();
+                
+                alert(`You've left ${group.name}.`);
+            }
+        }
+
+        function openGroupChat(groupId) {
+            currentGroup = groups.find(g => g.id === groupId);
+            
+            // Update chat interface
+            document.getElementById('group-initial').textContent = currentGroup.name.charAt(0).toUpperCase();
+            document.getElementById('group-name').textContent = currentGroup.name;
+            document.getElementById('group-members-count').textContent = `${currentGroup.members} members`;
+            document.getElementById('online-count').textContent = currentGroup.online;
+            
+            // Initialize group messages
+            groupMessages = [
+                {
+                    id: 1,
+                    sender: 'moderator',
+                    senderName: 'Group Moderator',
+                    message: `Welcome to ${currentGroup.name}! This is a safe space for sharing and support. Please read our community guidelines.`,
+                    timestamp: new Date(Date.now() - 3600000).toISOString()
+                },
+                {
+                    id: 2,
+                    sender: 'member',
+                    senderName: 'Sarah M.',
+                    message: 'Hi everyone! I\'m new here and looking forward to connecting with others who understand.',
+                    timestamp: new Date(Date.now() - 1800000).toISOString()
+                },
+                {
+                    id: 3,
+                    sender: 'member',
+                    senderName: 'Mike R.',
+                    message: 'Welcome Sarah! You\'re in the right place. We\'re all here to support each other.',
+                    timestamp: new Date(Date.now() - 900000).toISOString()
+                }
+            ];
+            
+            displayGroupMessages();
+            document.getElementById('group-chat').classList.remove('hidden');
+            document.getElementById('groups-section').classList.add('hidden');
+            
+            // Scroll to chat
+            document.getElementById('group-chat').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayGroupMessages() {
+            const messagesContainer = document.getElementById('group-messages');
+            messagesContainer.innerHTML = '';
+            
+            groupMessages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-bubble flex items-start space-x-3';
+                
+                const avatarClass = message.sender === 'moderator' ? 'moderator-avatar' : 'member-avatar';
+                const avatarInitial = message.senderName.charAt(0).toUpperCase();
+                
+                messageDiv.innerHTML = `
+                    <div class="${avatarClass} w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                        ${avatarInitial}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-1">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">${message.senderName}</span>
+                            ${message.sender === 'moderator' ? '<span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">Moderator</span>' : ''}
+                            <span class="text-xs text-gray-500 dark:text-gray-400">${new Date(message.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <p class="text-sm text-gray-700 dark:text-gray-300">${message.message}</p>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Send group message
+        document.getElementById('send-group-message').addEventListener('click', function() {
+            const input = document.getElementById('group-message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                const currentUser = getCurrentUser();
+                const senderName = currentUser ? currentUser.firstName : 'Anonymous';
+                
+                // Add user message
+                groupMessages.push({
+                    id: groupMessages.length + 1,
+                    sender: 'member',
+                    senderName: senderName,
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                input.value = '';
+                displayGroupMessages();
+                
+                // Simulate other members responding
+                setTimeout(() => {
+                    const responses = [
+                        "Thanks for sharing that!",
+                        "I can relate to what you're going through.",
+                        "That's really helpful advice.",
+                        "You're not alone in this.",
+                        "Thank you for being so open.",
+                        "I've been through something similar."
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    const members = ['Emma L.', 'David P.', 'Jennifer K.', 'Alex T.', 'Mike R.'];
+                    const randomMember = members[Math.floor(Math.random() * members.length)];
+                    
+                    groupMessages.push({
+                        id: groupMessages.length + 1,
+                        sender: 'member',
+                        senderName: randomMember,
+                        message: randomResponse,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    displayGroupMessages();
+                }, 2000);
+            }
+        });
+
+        // Enter key to send message
+        document.getElementById('group-message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-group-message').click();
+            }
+        });
+
+        // Leave group chat
+        document.getElementById('leave-group').addEventListener('click', function() {
+            document.getElementById('group-chat').classList.add('hidden');
+            document.getElementById('groups-section').classList.remove('hidden');
+            currentGroup = null;
+            groupMessages = [];
+        });
+
+        function viewGroupDetails(groupId) {
+            const group = groups.find(g => g.id === groupId);
+            alert(`${group.name}\n\nCategory: ${group.category}\nMembers: ${group.members}\nOnline: ${group.online}\n\n${group.description}\n\nRules:\n${group.rules.map(rule => '• ' + rule).join('\n')}`);
+        }
+
+        // Dark Mode Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', function() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "mindvault-website",
+  "version": "1.0.0",
+  "description": "MindVault - Your Mental Health Companion",
+  "private": true,
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'Static site - no build needed'",
+    "start": "python -m http.server 8000",
+    "deploy": "gh-pages -d .",
+    "test": "echo 'Run integration-test.html in browser'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.0",
+    "gh-pages": "^6.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.52.0"
+  }
+}

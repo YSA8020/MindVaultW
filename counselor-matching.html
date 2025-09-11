@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counselor Matching - MindVault</title>
+    <meta name="description" content="Connect with professional counselors who understand your needs">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        html { scroll-behavior: smooth; }
+        .counselor-card { transition: all 0.3s ease; }
+        .counselor-card:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .chat-message { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .typing-indicator { animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .online-indicator { animation: pulse 2s ease-in-out infinite; }
+        .dark select, .dark select option { background-color: #374151; color: #f9fafb; border-color: #4b5563; }
+        .dark input[type="text"], .dark input[type="email"], .dark input[type="password"], .dark textarea { background-color: #374151; color: #f9fafb; border-color: #4b5563; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <img src="assets/mindvault-icon.svg" alt="MindVault" class="h-8 w-8 mr-3">
+                    <span class="text-xl font-bold gradient-text">MindVault</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Dashboard</a>
+                    <a href="share.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Share</a>
+                    <a href="insights.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Insights</a>
+                    <a href="counselor-dashboard.html" class="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Professional</a>
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <svg id="sun-icon" class="w-5 h-5 text-yellow-500 hidden dark:block" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg id="moon-icon" class="w-5 h-5 text-gray-700 dark:hidden" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </button>
+                    <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                Find Your Perfect Counselor
+            </h1>
+            <p class="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Connect with licensed professionals who specialize in your specific needs. 
+                Our AI-powered matching system finds counselors who understand your unique situation.
+            </p>
+        </div>
+
+        <!-- Feature Access Check -->
+        <div id="upgrade-prompt" class="hidden bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-xl mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-semibold mb-2">Counselor Matching Available</h3>
+                    <p class="text-indigo-100">Upgrade to Premium or Professional to access counselor matching and chat.</p>
+                </div>
+                <a href="subscription.html" class="bg-white text-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                    Upgrade Now
+                </a>
+            </div>
+        </div>
+
+        <!-- Matching Preferences -->
+        <div id="matching-section" class="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Tell Us About Your Needs</h2>
+            
+            <form id="matching-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Concerns -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Concerns</label>
+                    <select id="concerns" name="concerns" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="">Select your main concern</option>
+                        <option value="anxiety">Anxiety & Panic</option>
+                        <option value="depression">Depression & Mood</option>
+                        <option value="trauma">Trauma & PTSD</option>
+                        <option value="relationships">Relationships</option>
+                        <option value="grief">Grief & Loss</option>
+                        <option value="addiction">Addiction & Recovery</option>
+                        <option value="eating">Eating Disorders</option>
+                        <option value="work">Work & Career Stress</option>
+                        <option value="family">Family Issues</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Preferred Approach -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Therapy Approach</label>
+                    <select id="approach" name="approach" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="">Select preferred approach</option>
+                        <option value="cbt">Cognitive Behavioral Therapy (CBT)</option>
+                        <option value="dbt">Dialectical Behavior Therapy (DBT)</option>
+                        <option value="psychodynamic">Psychodynamic</option>
+                        <option value="humanistic">Humanistic</option>
+                        <option value="mindfulness">Mindfulness-Based</option>
+                        <option value="solution-focused">Solution-Focused</option>
+                        <option value="no-preference">No Preference</option>
+                    </select>
+                </div>
+
+                <!-- Session Type -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Type</label>
+                    <select id="session-type" name="sessionType" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="">Select session type</option>
+                        <option value="video">Video Call</option>
+                        <option value="phone">Phone Call</option>
+                        <option value="chat">Text Chat</option>
+                        <option value="mixed">Mixed (Video + Chat)</option>
+                    </select>
+                </div>
+
+                <!-- Availability -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Preferred Time</label>
+                    <select id="availability" name="availability" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="">Select preferred time</option>
+                        <option value="morning">Morning (6 AM - 12 PM)</option>
+                        <option value="afternoon">Afternoon (12 PM - 6 PM)</option>
+                        <option value="evening">Evening (6 PM - 10 PM)</option>
+                        <option value="weekend">Weekends</option>
+                        <option value="flexible">Flexible</option>
+                    </select>
+                </div>
+
+                <!-- Language -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language</label>
+                    <select id="language" name="language" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="english">English</option>
+                        <option value="spanish">Spanish</option>
+                        <option value="french">French</option>
+                        <option value="german">German</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- Urgency -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Urgency Level</label>
+                    <select id="urgency" name="urgency" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                        <option value="low">Low - Can wait a few days</option>
+                        <option value="medium">Medium - Within 1-2 days</option>
+                        <option value="high">High - Need help today</option>
+                        <option value="crisis">Crisis - Immediate help needed</option>
+                    </select>
+                </div>
+            </form>
+
+            <div class="mt-6 text-center">
+                <button id="find-counselors" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                    Find My Perfect Match
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="matching-loading" class="hidden text-center py-12">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            <p class="mt-4 text-gray-600 dark:text-gray-300">Finding counselors who match your needs...</p>
+        </div>
+
+        <!-- Counselor Results -->
+        <div id="counselor-results" class="hidden">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">Your Matched Counselors</h2>
+            <div id="counselor-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Counselor cards will be populated here -->
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div id="chat-interface" class="hidden bg-white dark:bg-gray-800 rounded-xl shadow-sm">
+            <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center">
+                    <div class="relative">
+                        <img id="counselor-avatar" src="" alt="Counselor" class="w-12 h-12 rounded-full">
+                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full online-indicator"></div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 id="counselor-name" class="text-lg font-semibold text-gray-900 dark:text-white"></h3>
+                        <p id="counselor-specialty" class="text-sm text-gray-600 dark:text-gray-300"></p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-green-600 dark:text-green-400 font-medium">Online</span>
+                    <button id="end-chat" class="text-red-500 hover:text-red-700 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="h-96 overflow-y-auto p-6 space-y-4" id="chat-messages">
+                <!-- Chat messages will appear here -->
+            </div>
+
+            <div class="p-6 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center space-x-4">
+                    <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+                    <button id="send-message" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition-colors">
+                        Send
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    Messages are encrypted and confidential. Your counselor will respond within 24 hours.
+                </p>
+            </div>
+        </div>
+
+        <!-- Crisis Support -->
+        <div class="mt-8 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-lg font-semibold text-red-800 dark:text-red-200">In Crisis?</h3>
+                    <p class="mt-1 text-red-700 dark:text-red-300">
+                        If you're having thoughts of self-harm or suicide, please reach out immediately:
+                    </p>
+                    <div class="mt-3 space-y-2">
+                        <p class="text-red-700 dark:text-red-300">
+                            <strong>National Suicide Prevention Lifeline:</strong> 988
+                        </p>
+                        <p class="text-red-700 dark:text-red-300">
+                            <strong>Crisis Text Line:</strong> Text HOME to 741741
+                        </p>
+                        <p class="text-red-700 dark:text-red-300">
+                            <strong>Emergency Services:</strong> 911
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample counselor data
+        const counselors = [
+            {
+                id: 1,
+                name: "Dr. Sarah Johnson",
+                specialty: "Anxiety & Depression",
+                approach: "CBT",
+                experience: "8 years",
+                rating: 4.9,
+                sessions: 1200,
+                languages: ["English", "Spanish"],
+                availability: "Morning, Evening",
+                bio: "Licensed Clinical Psychologist specializing in anxiety disorders and depression. I use evidence-based CBT techniques to help clients develop healthy coping strategies.",
+                avatar: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&h=150&fit=crop&crop=face",
+                online: true,
+                responseTime: "Usually responds within 2 hours"
+            },
+            {
+                id: 2,
+                name: "Michael Chen, LCSW",
+                specialty: "Trauma & PTSD",
+                approach: "EMDR, DBT",
+                experience: "12 years",
+                rating: 4.8,
+                sessions: 2000,
+                languages: ["English", "Mandarin"],
+                availability: "Afternoon, Weekend",
+                bio: "Licensed Clinical Social Worker with extensive experience in trauma therapy. I specialize in EMDR and DBT for treating PTSD and complex trauma.",
+                avatar: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=150&h=150&fit=crop&crop=face",
+                online: true,
+                responseTime: "Usually responds within 1 hour"
+            },
+            {
+                id: 3,
+                name: "Dr. Maria Rodriguez",
+                specialty: "Relationships & Family",
+                approach: "Solution-Focused",
+                experience: "10 years",
+                rating: 4.9,
+                sessions: 1500,
+                languages: ["English", "Spanish"],
+                availability: "Evening, Weekend",
+                bio: "Licensed Marriage and Family Therapist specializing in relationship issues, communication problems, and family dynamics.",
+                avatar: "https://images.unsplash.com/photo-1594824388852-8a7b8a5b5b5b?w=150&h=150&fit=crop&crop=face",
+                online: false,
+                responseTime: "Usually responds within 4 hours"
+            },
+            {
+                id: 4,
+                name: "James Wilson, LMFT",
+                specialty: "Addiction & Recovery",
+                approach: "Motivational Interviewing",
+                experience: "15 years",
+                rating: 4.7,
+                sessions: 3000,
+                languages: ["English"],
+                availability: "Morning, Afternoon",
+                bio: "Licensed Marriage and Family Therapist with 15 years of experience in addiction treatment and recovery support.",
+                avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                online: true,
+                responseTime: "Usually responds within 3 hours"
+            },
+            {
+                id: 5,
+                name: "Dr. Emily Thompson",
+                specialty: "Eating Disorders",
+                approach: "DBT, Mindfulness",
+                experience: "6 years",
+                rating: 4.8,
+                sessions: 800,
+                languages: ["English"],
+                availability: "Afternoon, Evening",
+                bio: "Licensed Clinical Psychologist specializing in eating disorders and body image issues. I use DBT and mindfulness-based approaches.",
+                avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+                online: false,
+                responseTime: "Usually responds within 6 hours"
+            },
+            {
+                id: 6,
+                name: "Dr. Robert Kim",
+                specialty: "Work & Career Stress",
+                approach: "CBT, Coaching",
+                experience: "9 years",
+                rating: 4.9,
+                sessions: 1100,
+                languages: ["English", "Korean"],
+                availability: "Morning, Evening",
+                bio: "Licensed Psychologist specializing in workplace stress, career transitions, and professional development.",
+                avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+                online: true,
+                responseTime: "Usually responds within 2 hours"
+            }
+        ];
+
+        let currentCounselor = null;
+        let chatMessages = [];
+
+        // Check feature access on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!hasFeatureAccess('counselor_matching')) {
+                document.getElementById('upgrade-prompt').classList.remove('hidden');
+                document.getElementById('matching-section').classList.add('hidden');
+            }
+        });
+
+        // Find counselors button
+        document.getElementById('find-counselors').addEventListener('click', function() {
+            const formData = new FormData(document.getElementById('matching-form'));
+            const preferences = Object.fromEntries(formData);
+            
+            // Show loading
+            document.getElementById('matching-loading').classList.remove('hidden');
+            document.getElementById('counselor-results').classList.add('hidden');
+            
+            // Simulate matching process
+            setTimeout(() => {
+                findMatchingCounselors(preferences);
+            }, 2000);
+        });
+
+        function findMatchingCounselors(preferences) {
+            // Hide loading
+            document.getElementById('matching-loading').classList.add('hidden');
+            
+            // Filter counselors based on preferences
+            let matchedCounselors = counselors;
+            
+            if (preferences.concerns) {
+                matchedCounselors = matchedCounselors.filter(counselor => 
+                    counselor.specialty.toLowerCase().includes(preferences.concerns.toLowerCase()) ||
+                    preferences.concerns === 'other'
+                );
+            }
+            
+            if (preferences.approach && preferences.approach !== 'no-preference') {
+                matchedCounselors = matchedCounselors.filter(counselor => 
+                    counselor.approach.toLowerCase().includes(preferences.approach.toLowerCase())
+                );
+            }
+            
+            // Sort by rating and availability
+            matchedCounselors.sort((a, b) => {
+                if (a.online && !b.online) return -1;
+                if (!a.online && b.online) return 1;
+                return b.rating - a.rating;
+            });
+            
+            displayCounselors(matchedCounselors.slice(0, 6)); // Show top 6 matches
+        }
+
+        function displayCounselors(counselors) {
+            const grid = document.getElementById('counselor-grid');
+            grid.innerHTML = '';
+            
+            counselors.forEach(counselor => {
+                const card = createCounselorCard(counselor);
+                grid.appendChild(card);
+            });
+            
+            document.getElementById('counselor-results').classList.remove('hidden');
+        }
+
+        function createCounselorCard(counselor) {
+            const card = document.createElement('div');
+            card.className = 'counselor-card bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700';
+            
+            card.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <div class="relative">
+                        <img src="${counselor.avatar}" alt="${counselor.name}" class="w-16 h-16 rounded-full object-cover">
+                        <div class="absolute -bottom-1 -right-1 w-5 h-5 ${counselor.online ? 'bg-green-500' : 'bg-gray-400'} rounded-full"></div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${counselor.name}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">${counselor.specialty}</p>
+                        <div class="flex items-center mt-1">
+                            <div class="flex text-yellow-400">
+                                ${'★'.repeat(Math.floor(counselor.rating))}${'☆'.repeat(5 - Math.floor(counselor.rating))}
+                            </div>
+                            <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">${counselor.rating} (${counselor.sessions} sessions)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">${counselor.bio}</p>
+                
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Experience:</span>
+                        <span class="text-gray-900 dark:text-white">${counselor.experience}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Approach:</span>
+                        <span class="text-gray-900 dark:text-white">${counselor.approach}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Availability:</span>
+                        <span class="text-gray-900 dark:text-white">${counselor.availability}</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500 dark:text-gray-400">Response Time:</span>
+                        <span class="text-gray-900 dark:text-white">${counselor.responseTime}</span>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button onclick="startChat(${counselor.id})" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg transition-colors">
+                        Start Chat
+                    </button>
+                    <button onclick="viewProfile(${counselor.id})" class="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                        Profile
+                    </button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        function startChat(counselorId) {
+            currentCounselor = counselors.find(c => c.id === counselorId);
+            
+            // Update chat interface
+            document.getElementById('counselor-avatar').src = currentCounselor.avatar;
+            document.getElementById('counselor-name').textContent = currentCounselor.name;
+            document.getElementById('counselor-specialty').textContent = currentCounselor.specialty;
+            
+            // Initialize chat messages
+            chatMessages = [
+                {
+                    id: 1,
+                    sender: 'counselor',
+                    message: `Hello! I'm ${currentCounselor.name}. I'm here to help you with ${currentCounselor.specialty.toLowerCase()}. How are you feeling today?`,
+                    timestamp: new Date().toISOString()
+                }
+            ];
+            
+            displayChatMessages();
+            document.getElementById('chat-interface').classList.remove('hidden');
+            document.getElementById('counselor-results').classList.add('hidden');
+            
+            // Scroll to chat
+            document.getElementById('chat-interface').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayChatMessages() {
+            const messagesContainer = document.getElementById('chat-messages');
+            messagesContainer.innerHTML = '';
+            
+            chatMessages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.sender === 'user' 
+                        ? 'bg-indigo-600 text-white' 
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white'}">
+                        <p class="text-sm">${message.message}</p>
+                        <p class="text-xs mt-1 opacity-70">${new Date(message.timestamp).toLocaleTimeString()}</p>
+                    </div>
+                `;
+                
+                messagesContainer.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Send message
+        document.getElementById('send-message').addEventListener('click', function() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                chatMessages.push({
+                    id: chatMessages.length + 1,
+                    sender: 'user',
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                input.value = '';
+                displayChatMessages();
+                
+                // Simulate counselor response
+                setTimeout(() => {
+                    const responses = [
+                        "I understand. Can you tell me more about that?",
+                        "That sounds really challenging. How long have you been feeling this way?",
+                        "Thank you for sharing that with me. What would you like to focus on today?",
+                        "I hear you. What coping strategies have you tried so far?",
+                        "That's a great insight. How does that make you feel?",
+                        "I appreciate you being so open. What would you like to work on together?"
+                    ];
+                    
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    chatMessages.push({
+                        id: chatMessages.length + 1,
+                        sender: 'counselor',
+                        message: randomResponse,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    displayChatMessages();
+                }, 2000);
+            }
+        });
+
+        // Enter key to send message
+        document.getElementById('message-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('send-message').click();
+            }
+        });
+
+        // End chat
+        document.getElementById('end-chat').addEventListener('click', function() {
+            document.getElementById('chat-interface').classList.add('hidden');
+            document.getElementById('counselor-results').classList.remove('hidden');
+            currentCounselor = null;
+            chatMessages = [];
+        });
+
+        function viewProfile(counselorId) {
+            const counselor = counselors.find(c => c.id === counselorId);
+            alert(`${counselor.name}\n\nSpecialty: ${counselor.specialty}\nExperience: ${counselor.experience}\nApproach: ${counselor.approach}\n\n${counselor.bio}`);
+        }
+
+        // Dark Mode Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        if (currentTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+
+        themeToggle.addEventListener('click', function() {
+            const isDark = document.documentElement.classList.contains('dark');
+            
+            if (isDark) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
