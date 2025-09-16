@@ -278,6 +278,22 @@
     </div>
 
     <script>
+        let loginDB = null;
+
+        // Initialize database
+        async function initLoginDB() {
+            try {
+                loginDB = new MindVaultDB();
+                await loginDB.init();
+                console.log('Login database initialized');
+            } catch (error) {
+                console.error('Login database initialization failed:', error);
+            }
+        }
+
+        // Initialize database on page load
+        initLoginDB();
+
         // Form submission
         document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -289,11 +305,16 @@
             
             // Check if user exists in database
             try {
-                const userData = await mindVaultDB.getUserByEmail(data.email);
+                if (!loginDB) {
+                    alert('Database not ready. Please wait a moment and try again.');
+                    return;
+                }
+                
+                const userData = await loginDB.getUserByEmail(data.email);
                 
                 if (userData && userData.password === data.password) {
                     // Update last login
-                    await mindVaultDB.updateUser(userData.id, { lastLogin: new Date().toISOString() });
+                    await loginDB.updateUser(userData.id, { lastLogin: new Date().toISOString() });
                     
                     // Store session data
                     localStorage.setItem('isLoggedIn', 'true');
