@@ -89,9 +89,8 @@
                     localStorage.setItem('userId', userData.id);
                     localStorage.setItem('userData', JSON.stringify(userData));
                     
-                    setTimeout(() => {
-                        window.location.href = 'dashboard-simple.html?plan=' + userData.plan;
-                    }, 2000);
+                    // Redirect immediately
+                    window.location.href = 'dashboard-simple.html?plan=' + userData.plan;
                     
                 } else {
                     console.log('Password does not match or user not found');

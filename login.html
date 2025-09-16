@@ -326,16 +326,13 @@
                     localStorage.setItem('userId', userData.id);
                     localStorage.setItem('userData', JSON.stringify(userData));
                     
-                    alert('Sign in successful! Redirecting to dashboard...');
-                    
                     // Calculate remaining trial days
                     const trialEnd = new Date(userData.trialEnd);
                     const now = new Date();
                     const remainingDays = Math.ceil((trialEnd - now) / (1000 * 60 * 60 * 24));
                     
-                    setTimeout(() => {
-                        window.location.href = `dashboard-simple.html?plan=${userData.plan}&days=${Math.max(0, remainingDays)}`;
-                    }, 1000);
+                    // Redirect immediately without alert
+                    window.location.href = `dashboard-simple.html?plan=${userData.plan}&days=${Math.max(0, remainingDays)}`;
                 } else {
                     alert('Invalid email or password. Please try again.');
                 }
