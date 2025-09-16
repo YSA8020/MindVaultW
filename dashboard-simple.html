@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MindVault</title>
+    <meta name="description" content="Your personal mental health dashboard">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database.js"></script>
+    <script src="js/auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .gradient-text { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        /* Dark Mode Styles */
+        .dark { background-color: #0f172a; color: #f1f5f9; }
+        .dark nav { background-color: rgba(15, 23, 42, 0.8); backdrop-filter: blur(16px); }
+        .dark .bg-white { background-color: #1e293b; }
+        .dark .bg-gray-50 { background-color: #334155; }
+        .dark .bg-gray-100 { background-color: #475569; }
+        .dark .text-gray-900 { color: #f1f5f9; }
+        .dark .text-gray-700 { color: #cbd5e1; }
+        .dark .text-gray-600 { color: #94a3b8; }
+        .dark .border-gray-200 { border-color: #475569; }
+        .dark .border-gray-300 { border-color: #64748b; }
+        .dark .bg-gradient-to-br { background: linear-gradient(to bottom right, #1e293b, #334155); }
+        .dark .from-blue-50 { --tw-gradient-from: #1e293b; }
+        .dark .to-indigo-100 { --tw-gradient-to: #334155; }
+        .dark .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2); }
+        .dark .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2); }
+        .dark #theme-toggle { background-color: #475569; }
+        .dark #theme-toggle:hover { background-color: #64748b; }
+        
+        .feature-card { transition: all 0.3s ease; cursor: pointer; }
+        .feature-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); }
+        
+        * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 transition-colors duration-300">
+    <!-- Navigation -->
+    <nav class="bg-white/80 backdrop-blur-md shadow-sm fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <img src="assets/mindvault-icon.svg" alt="MindVault" class="h-8 w-8">
+                    <span class="text-2xl font-bold text-gray-900">MindVault</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="dashboard.html" class="text-gray-600 hover:text-indigo-600 transition-colors">Dashboard</a>
+                    <a href="share.html" class="text-gray-600 hover:text-indigo-600 transition-colors">Share</a>
+                    <a href="insights.html" class="text-gray-600 hover:text-indigo-600 transition-colors">Insights</a>
+                    <a href="counselor-matching.html" class="text-gray-600 hover:text-indigo-600 transition-colors">Counselors</a>
+                    <a href="peer-support.html" class="text-gray-600 hover:text-indigo-600 transition-colors">Support</a>
+                    <a href="progress-tracking.html" class="text-gray-600 hover:text-indigo-600 transition-colors">Progress</a>
+                    <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">Logout</button>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <svg id="sun-icon" class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <svg id="moon-icon" class="h-5 w-5 text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Welcome Section -->
+            <div class="mb-8">
+                <h1 class="text-4xl font-bold text-gray-900 mb-2">
+                    Welcome back, <span id="user-name" class="gradient-text">User</span>!
+                </h1>
+                <p class="text-xl text-gray-600">How are you feeling today?</p>
+            </div>
+
+            <!-- Trial Banner -->
+            <div id="trial-banner" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 rounded-2xl mb-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">Free Trial Active</h3>
+                        <p id="trial-status" class="text-indigo-100">11 days remaining in your Premium trial</p>
+                        <div class="mt-3 bg-white/20 rounded-full h-2 w-full">
+                            <div class="progress-bar bg-white rounded-full h-2" style="width: 21%"></div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-3xl font-bold">11</div>
+                        <div class="text-indigo-100">Days Left</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Mood Tracking -->
+                <div class="feature-card bg-white p-6 rounded-2xl shadow-lg" onclick="trackMood()">
+                    <div class="text-center">
+                        <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Track Mood</h3>
+                        <p class="text-gray-600 text-sm">Log how you're feeling</p>
+                    </div>
+                </div>
+
+                <!-- Share Thoughts -->
+                <div class="feature-card bg-white p-6 rounded-2xl shadow-lg" onclick="window.location.href='share.html'">
+                    <div class="text-center">
+                        <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Share Thoughts</h3>
+                        <p class="text-gray-600 text-sm">Express yourself anonymously</p>
+                    </div>
+                </div>
+
+                <!-- Get Insights -->
+                <div class="feature-card bg-white p-6 rounded-2xl shadow-lg" onclick="window.location.href='insights.html'">
+                    <div class="text-center">
+                        <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Get Insights</h3>
+                        <p class="text-gray-600 text-sm">AI-powered analysis</p>
+                    </div>
+                </div>
+
+                <!-- Find Support -->
+                <div class="feature-card bg-white p-6 rounded-2xl shadow-lg" onclick="window.location.href='peer-support.html'">
+                    <div class="text-center">
+                        <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Find Support</h3>
+                        <p class="text-gray-600 text-sm">Connect with peers</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white p-6 rounded-2xl shadow-lg">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">Recent Activity</h2>
+                <div class="space-y-4">
+                    <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                        <div class="bg-blue-100 p-3 rounded-full mr-4">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Mood logged</h3>
+                            <p class="text-gray-600 text-sm">You felt good today</p>
+                            <p class="text-gray-500 text-xs">2 hours ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                        <div class="bg-green-100 p-3 rounded-full mr-4">
+                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900">Thought shared</h3>
+                            <p class="text-gray-600 text-sm">You shared your thoughts anonymously</p>
+                            <p class="text-gray-500 text-xs">1 day ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPlan = 'premium';
+        let trialDaysRemaining = 11;
+        let dashboardDB = null;
+
+        // Initialize database
+        async function initDashboardDB() {
+            try {
+                dashboardDB = new MindVaultDB();
+                await dashboardDB.init();
+                console.log('Dashboard database initialized');
+            } catch (error) {
+                console.error('Dashboard database initialization failed:', error);
+            }
+        }
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentPlan = urlParams.get('plan') || 'premium';
+            trialDaysRemaining = parseInt(urlParams.get('days')) || 11;
+            
+            // Get user name from localStorage
+            const userName = localStorage.getItem('userName') || 'User';
+            document.getElementById('user-name').textContent = userName;
+            
+            updateTrialStatus();
+        }
+
+        function updateTrialStatus() {
+            const trialStatus = document.getElementById('trial-status');
+            const progressBar = document.querySelector('.progress-bar');
+            
+            if (trialDaysRemaining > 0) {
+                trialStatus.textContent = `${trialDaysRemaining} days remaining in your ${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} trial`;
+                const progress = ((14 - trialDaysRemaining) / 14) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+        }
+
+        function trackMood() {
+            alert('Mood tracking feature coming soon!');
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userName');
+            localStorage.removeItem('userId');
+            localStorage.removeItem('userData');
+            window.location.href = 'index.html';
+        }
+
+        // Dark Mode Toggle Functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        
+        // Apply the saved theme
+        if (currentTheme === 'dark') {
+            body.classList.add('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        } else {
+            body.classList.remove('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        }
+        
+        // Theme toggle event listener
+        themeToggle.addEventListener('click', function() {
+            if (body.classList.contains('dark')) {
+                // Switch to light mode
+                body.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                localStorage.setItem('theme', 'light');
+            } else {
+                // Switch to dark mode
+                body.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        
+        // Detect system preference on first visit
+        if (!localStorage.getItem('theme')) {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                body.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Initialize on page load
+        initDashboardDB();
+        initializeDashboard();
+    </script>
+</body>
+</html>
