@@ -616,9 +616,11 @@
         // Initialize database when page loads
         async function initDatabase() {
             try {
+                console.log('Starting database initialization...');
                 mindVaultDB = new MindVaultDB();
                 await mindVaultDB.init();
                 console.log('Database initialized successfully');
+                console.log('mindVaultDB object:', mindVaultDB);
             } catch (error) {
                 console.error('Database initialization failed:', error);
                 alert('Database initialization failed. Please refresh the page.');
@@ -690,8 +692,12 @@
         document.getElementById('registration-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            console.log('Form submission triggered!');
+            console.log('Database status:', mindVaultDB ? 'Ready' : 'Not ready');
+            
             // Check if database is ready
             if (!mindVaultDB) {
+                console.log('Database not ready, showing alert');
                 alert('Database is not ready yet. Please wait a moment and try again.');
                 return;
             }
@@ -745,11 +751,13 @@
                 };
                 
                 console.log('Creating user with data:', userData);
+                console.log('About to call mindVaultDB.createUser...');
                 
                 // Create user in database
                 const createdUser = await mindVaultDB.createUser(userData);
                 
                 console.log('User created successfully:', createdUser);
+                console.log('User ID:', createdUser.id);
                 
                 // Store session data
                 localStorage.setItem('userData', JSON.stringify(createdUser));
@@ -762,12 +770,19 @@
                 
                 // Redirect based on plan
                 setTimeout(() => {
+                    console.log('Starting navigation...');
+                    console.log('Plan:', data.plan);
+                    console.log('User ID:', createdUser.id);
+                    
                     if (data.plan === 'basic') {
                         // For basic plan, go directly to dashboard
+                        console.log('Redirecting to dashboard for basic plan');
                         window.location.href = `dashboard.html?plan=${data.plan}&userId=${createdUser.id}`;
                     } else {
                         // For premium/professional plans, go to payment
+                        console.log('Redirecting to payment page for premium/professional plan');
                         const paymentUrl = `payment.html?plan=${data.plan}&billing=${isAnnual ? 'annual' : 'monthly'}&userId=${createdUser.id}`;
+                        console.log('Payment URL:', paymentUrl);
                         window.location.href = paymentUrl;
                     }
                 }, 1000);

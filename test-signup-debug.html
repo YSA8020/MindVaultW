@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup Debug Test - MindVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6 text-center">Signup Debug Test</h1>
+        
+        <!-- Status Panel -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Debug Status</h2>
+            <div id="debug-status" class="space-y-2">
+                <div id="db-status" class="p-2 bg-gray-100 rounded">Database: Initializing...</div>
+                <div id="form-status" class="p-2 bg-gray-100 rounded">Form: Ready</div>
+                <div id="navigation-status" class="p-2 bg-gray-100 rounded">Navigation: Pending</div>
+            </div>
+        </div>
+
+        <!-- Test Form -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Test Signup Form</h2>
+            
+            <form id="test-signup-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">First Name *</label>
+                        <input type="text" name="firstName" value="Test" required class="w-full p-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Last Name *</label>
+                        <input type="text" name="lastName" value="User" required class="w-full p-2 border rounded">
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Email *</label>
+                    <input type="email" name="email" value="test@example.com" required class="w-full p-2 border rounded">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Password *</label>
+                    <input type="password" name="password" value="password123" required class="w-full p-2 border rounded">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Confirm Password *</label>
+                    <input type="password" name="confirmPassword" value="password123" required class="w-full p-2 border rounded">
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">User Type</label>
+                    <select name="userType" class="w-full p-2 border rounded">
+                        <option value="user" selected>I'm Seeking Support</option>
+                        <option value="peer">I Want to Help Others</option>
+                    </select>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Plan</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="plan" value="basic" class="mr-2">
+                            <span>Basic (Free)</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="plan" value="premium" checked class="mr-2">
+                            <span>Premium ($19/month)</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="plan" value="professional" class="mr-2">
+                            <span>Professional ($49/month)</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" name="terms" required class="mr-2">
+                        <span>I agree to terms and conditions</span>
+                    </label>
+                </div>
+                
+                <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700">
+                    Test Signup
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Panel -->
+        <div id="results-panel" class="bg-white p-6 rounded-lg shadow mt-6 hidden">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <div id="results-content" class="space-y-2"></div>
+        </div>
+
+        <!-- Console Output -->
+        <div class="bg-black text-green-400 p-4 rounded-lg mt-6 font-mono text-sm">
+            <h3 class="text-white mb-2">Console Output:</h3>
+            <div id="console-output" class="space-y-1"></div>
+        </div>
+    </div>
+
+    <script>
+        let mindVaultDB = null;
+        let debugLog = [];
+
+        // Custom console.log for debugging
+        function debugLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+            debugLog.push(logEntry);
+            
+            const consoleOutput = document.getElementById('console-output');
+            const logDiv = document.createElement('div');
+            logDiv.textContent = logEntry;
+            logDiv.className = type === 'error' ? 'text-red-400' : 'text-green-400';
+            consoleOutput.appendChild(logDiv);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            console.log(logEntry);
+        }
+
+        // Initialize database
+        async function initDatabase() {
+            try {
+                debugLog('Starting database initialization...');
+                updateStatus('db-status', 'Database: Initializing...', 'bg-yellow-100');
+                
+                mindVaultDB = new MindVaultDB();
+                await mindVaultDB.init();
+                
+                debugLog('Database initialized successfully');
+                updateStatus('db-status', 'Database: ✅ Ready', 'bg-green-100');
+                
+            } catch (error) {
+                debugLog(`Database initialization failed: ${error.message}`, 'error');
+                updateStatus('db-status', `Database: ❌ Error - ${error.message}`, 'bg-red-100');
+            }
+        }
+
+        // Update status display
+        function updateStatus(elementId, text, className = 'bg-gray-100') {
+            const element = document.getElementById(elementId);
+            element.textContent = text;
+            element.className = `p-2 rounded ${className}`;
+        }
+
+        // Add result to results panel
+        function addResult(message, type = 'info') {
+            const resultsPanel = document.getElementById('results-panel');
+            const resultsContent = document.getElementById('results-content');
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `p-2 rounded ${type === 'error' ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`;
+            resultDiv.textContent = message;
+            
+            resultsContent.appendChild(resultDiv);
+            resultsPanel.classList.remove('hidden');
+        }
+
+        // Form submission handler
+        document.getElementById('test-signup-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            debugLog('Form submission started');
+            updateStatus('form-status', 'Form: Processing...', 'bg-yellow-100');
+            
+            // Check database
+            if (!mindVaultDB) {
+                debugLog('Database not ready', 'error');
+                addResult('❌ Database not ready. Please wait for initialization.', 'error');
+                updateStatus('form-status', 'Form: ❌ Database not ready', 'bg-red-100');
+                return;
+            }
+            
+            // Get form data
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            debugLog(`Form data: ${JSON.stringify(data)}`);
+            
+            // Validation
+            if (data.password !== data.confirmPassword) {
+                debugLog('Password mismatch', 'error');
+                addResult('❌ Passwords do not match', 'error');
+                return;
+            }
+            
+            if (!data.plan) {
+                debugLog('No plan selected', 'error');
+                addResult('❌ Please select a plan', 'error');
+                return;
+            }
+            
+            // Create user data
+            const userData = {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                password: data.password,
+                userType: data.userType,
+                plan: data.plan,
+                billing: 'monthly',
+                newsletter: false
+            };
+            
+            debugLog(`Creating user with data: ${JSON.stringify(userData)}`);
+            
+            try {
+                // Create user
+                const createdUser = await mindVaultDB.createUser(userData);
+                debugLog(`User created successfully: ${JSON.stringify(createdUser)}`);
+                
+                addResult(`✅ User created successfully! ID: ${createdUser.id}`);
+                updateStatus('form-status', 'Form: ✅ User created', 'bg-green-100');
+                
+                // Store in localStorage
+                localStorage.setItem('userData', JSON.stringify(createdUser));
+                localStorage.setItem('userName', createdUser.firstName);
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', createdUser.id);
+                
+                debugLog('User data stored in localStorage');
+                
+                // Test navigation
+                updateStatus('navigation-status', 'Navigation: Testing...', 'bg-yellow-100');
+                
+                setTimeout(() => {
+                    debugLog(`Testing navigation for plan: ${data.plan}`);
+                    
+                    if (data.plan === 'basic') {
+                        debugLog('Redirecting to dashboard (basic plan)');
+                        addResult('🔄 Redirecting to dashboard...');
+                        window.location.href = `dashboard.html?plan=${data.plan}&userId=${createdUser.id}`;
+                    } else {
+                        debugLog('Redirecting to payment page');
+                        addResult('🔄 Redirecting to payment page...');
+                        window.location.href = `payment.html?plan=${data.plan}&userId=${createdUser.id}`;
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                debugLog(`Error creating user: ${error.message}`, 'error');
+                addResult(`❌ Error creating user: ${error.message}`, 'error');
+                updateStatus('form-status', 'Form: ❌ Error', 'bg-red-100');
+            }
+        });
+
+        // Initialize on page load
+        window.addEventListener('load', function() {
+            debugLog('Page loaded, initializing database...');
+            initDatabase();
+        });
+    </script>
+</body>
+</html>

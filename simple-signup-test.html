@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Signup Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        <h1 class="text-2xl font-bold mb-4">Simple Signup Test</h1>
+        
+        <div id="status" class="mb-4 p-3 bg-gray-100 rounded">
+            <strong>Status:</strong> <span id="status-text">Loading...</span>
+        </div>
+        
+        <form id="simple-form">
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Email</label>
+                <input type="email" name="email" value="test@example.com" required class="w-full p-2 border rounded">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Password</label>
+                <input type="password" name="password" value="password123" required class="w-full p-2 border rounded">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Plan</label>
+                <select name="plan" class="w-full p-2 border rounded">
+                    <option value="basic">Basic (Free)</option>
+                    <option value="premium" selected>Premium</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+                Test Signup
+            </button>
+        </form>
+        
+        <div id="result" class="mt-4 p-3 bg-gray-100 rounded hidden">
+            <strong>Result:</strong> <span id="result-text"></span>
+        </div>
+    </div>
+
+    <script>
+        let db = null;
+        
+        // Initialize database
+        async function initDB() {
+            try {
+                document.getElementById('status-text').textContent = 'Initializing database...';
+                
+                db = new MindVaultDB();
+                await db.init();
+                
+                document.getElementById('status-text').textContent = 'Database ready!';
+                console.log('Database initialized successfully');
+                
+            } catch (error) {
+                document.getElementById('status-text').textContent = 'Database error: ' + error.message;
+                console.error('Database initialization failed:', error);
+            }
+        }
+        
+        // Form submission
+        document.getElementById('simple-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!db) {
+                alert('Database not ready');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            console.log('Submitting form with data:', data);
+            
+            try {
+                const userData = {
+                    firstName: 'Test',
+                    lastName: 'User',
+                    email: data.email,
+                    password: data.password,
+                    userType: 'user',
+                    plan: data.plan,
+                    billing: 'monthly',
+                    newsletter: false
+                };
+                
+                console.log('Creating user with:', userData);
+                
+                const user = await db.createUser(userData);
+                
+                console.log('User created:', user);
+                
+                document.getElementById('result-text').textContent = 'User created! ID: ' + user.id;
+                document.getElementById('result').classList.remove('hidden');
+                
+                // Test navigation
+                setTimeout(() => {
+                    console.log('Testing navigation...');
+                    if (data.plan === 'basic') {
+                        console.log('Going to dashboard');
+                        window.location.href = 'dashboard.html?plan=basic&userId=' + user.id;
+                    } else {
+                        console.log('Going to payment');
+                        window.location.href = 'payment.html?plan=' + data.plan + '&userId=' + user.id;
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result-text').textContent = 'Error: ' + error.message;
+                document.getElementById('result').classList.remove('hidden');
+            }
+        });
+        
+        // Initialize on load
+        initDB();
+    </script>
+</body>
+</html>
