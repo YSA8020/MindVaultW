@@ -294,13 +294,10 @@ class MindVaultDB {
     }
 }
 
-// Initialize database
-const mindVaultDB = new MindVaultDB();
-
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = MindVaultDB;
 } else {
     window.MindVaultDB = MindVaultDB;
-    window.mindVaultDB = mindVaultDB;
+    // Don't auto-initialize - let each page handle its own instance
 }
