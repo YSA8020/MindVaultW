@@ -14,21 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        
-    - name: Install dependencies
-      run: npm install
-      
-    - name: Run tests
-      run: |
-        echo "Running integration tests..."
-        # Add your test commands here
-        echo "Tests completed"
-        
     - name: Deploy to GitHub Pages
       if: github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v3
@@ -48,3 +33,11 @@ jobs:
           js/database.js
           test-signup.html
           integration-test.html
+          production-test.html
+          deploy.bat
+          deploy.sh
+          config-template.js
+          BACKEND-SETUP.md
+          DEPLOYMENT-CHECKLIST.md
+          DEPLOYMENT.md
+          PRODUCTION-READY.md
