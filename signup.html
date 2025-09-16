@@ -283,7 +283,7 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Regular User -->
-                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="selectUserType('user')">
+                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="selectUserType('user', this)">
                         <div class="text-center">
                             <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,7 +319,7 @@
                     </div>
 
                     <!-- Peer Support Person -->
-                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="selectUserType('peer')">
+                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="selectUserType('peer', this)">
                         <div class="text-center">
                             <div class="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -629,10 +629,15 @@
 
         // Initialize database on page load
         initDatabase();
+        
+        // Test function availability
+        console.log('selectUserType function available:', typeof window.selectUserType);
 
         // Global function for user type selection
-        window.selectUserType = function(type) {
+        window.selectUserType = function(type, element) {
             selectedUserType = type;
+            
+            console.log('User type selected:', type);
             
             // Remove selected class from all cards
             document.querySelectorAll('.user-type-card').forEach(card => {
@@ -640,10 +645,12 @@
             });
             
             // Add selected class to clicked card
-            event.currentTarget.classList.add('selected');
+            element.classList.add('selected');
             
             // Show signup form
-            document.getElementById('signup-form').classList.remove('hidden');
+            const signupForm = document.getElementById('signup-form');
+            signupForm.classList.remove('hidden');
+            console.log('Signup form should now be visible');
             
             // Show/hide peer support fields
             const peerFields = document.getElementById('peer-support-fields');
@@ -654,7 +661,7 @@
             }
             
             // Scroll to form
-            document.getElementById('signup-form').scrollIntoView({ behavior: 'smooth' });
+            signupForm.scrollIntoView({ behavior: 'smooth' });
         }
 
         // Billing toggle functionality
