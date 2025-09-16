@@ -611,6 +611,22 @@
 
     <script>
         let selectedUserType = null;
+        let mindVaultDB = null;
+
+        // Initialize database when page loads
+        async function initDatabase() {
+            try {
+                mindVaultDB = new MindVaultDB();
+                await mindVaultDB.init();
+                console.log('Database initialized successfully');
+            } catch (error) {
+                console.error('Database initialization failed:', error);
+                alert('Database initialization failed. Please refresh the page.');
+            }
+        }
+
+        // Initialize database on page load
+        initDatabase();
 
         function selectUserType(type) {
             selectedUserType = type;
@@ -674,6 +690,12 @@
         document.getElementById('registration-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
+            // Check if database is ready
+            if (!mindVaultDB) {
+                alert('Database is not ready yet. Please wait a moment and try again.');
+                return;
+            }
+            
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
@@ -722,8 +744,12 @@
                     newsletter: data.newsletter === 'on'
                 };
                 
+                console.log('Creating user with data:', userData);
+                
                 // Create user in database
                 const createdUser = await mindVaultDB.createUser(userData);
+                
+                console.log('User created successfully:', createdUser);
                 
                 // Store session data
                 localStorage.setItem('userData', JSON.stringify(createdUser));
@@ -732,12 +758,18 @@
                 localStorage.setItem('userId', createdUser.id);
                 
                 // Show success message
-                alert('Account created successfully! Redirecting to payment...');
+                alert('Account created successfully! Redirecting...');
                 
-                // Redirect to payment page with plan info
+                // Redirect based on plan
                 setTimeout(() => {
-                    const paymentUrl = `payment.html?plan=${data.plan}&billing=${isAnnual ? 'annual' : 'monthly'}&userId=${createdUser.id}`;
-                    window.location.href = paymentUrl;
+                    if (data.plan === 'basic') {
+                        // For basic plan, go directly to dashboard
+                        window.location.href = `dashboard.html?plan=${data.plan}&userId=${createdUser.id}`;
+                    } else {
+                        // For premium/professional plans, go to payment
+                        const paymentUrl = `payment.html?plan=${data.plan}&billing=${isAnnual ? 'annual' : 'monthly'}&userId=${createdUser.id}`;
+                        window.location.href = paymentUrl;
+                    }
                 }, 1000);
                 
             } catch (error) {
