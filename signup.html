@@ -796,7 +796,7 @@
                     if (data.plan === 'basic') {
                         // For basic plan, go directly to dashboard
                         console.log('Redirecting to dashboard for basic plan');
-                        window.location.href = `dashboard.html?plan=${data.plan}&userId=${createdUser.id}`;
+                        window.location.href = `dashboard-simple.html?plan=${data.plan}&userId=${createdUser.id}`;
                     } else {
                         // For premium/professional plans, go to payment
                         console.log('Redirecting to payment page for premium/professional plan');
