@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - MindVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/database.js"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow">
+        <h1 class="text-2xl font-bold mb-4">Login Test</h1>
+        
+        <div id="status" class="mb-4 p-3 bg-gray-100 rounded">
+            <strong>Status:</strong> <span id="status-text">Loading...</span>
+        </div>
+        
+        <form id="test-login-form">
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Email</label>
+                <input type="email" name="email" value="ogbefunlo19@gmail.com" required class="w-full p-2 border rounded">
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Password</label>
+                <input type="password" name="password" value="Cos12345678" required class="w-full p-2 border rounded">
+            </div>
+            
+            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">
+                Test Login
+            </button>
+        </form>
+        
+        <div id="result" class="mt-4 p-3 bg-gray-100 rounded hidden">
+            <strong>Result:</strong> <span id="result-text"></span>
+        </div>
+    </div>
+
+    <script>
+        let testDB = null;
+        
+        // Initialize database
+        async function initTestDB() {
+            try {
+                document.getElementById('status-text').textContent = 'Initializing database...';
+                
+                testDB = new MindVaultDB();
+                await testDB.init();
+                
+                document.getElementById('status-text').textContent = 'Database ready!';
+                console.log('Test database initialized successfully');
+                
+            } catch (error) {
+                document.getElementById('status-text').textContent = 'Database error: ' + error.message;
+                console.error('Database initialization failed:', error);
+            }
+        }
+        
+        // Form submission
+        document.getElementById('test-login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!testDB) {
+                alert('Database not ready');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            console.log('Testing login with data:', data);
+            
+            try {
+                console.log('Looking for user with email:', data.email);
+                
+                const userData = await testDB.getUserByEmail(data.email);
+                
+                console.log('User found:', userData);
+                
+                if (userData && userData.password === data.password) {
+                    console.log('Password matches!');
+                    
+                    document.getElementById('result-text').textContent = 'Login successful! User: ' + userData.firstName;
+                    document.getElementById('result').classList.remove('hidden');
+                    
+                    // Store session data
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userName', userData.firstName);
+                    localStorage.setItem('userId', userData.id);
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html?plan=' + userData.plan;
+                    }, 2000);
+                    
+                } else {
+                    console.log('Password does not match or user not found');
+                    document.getElementById('result-text').textContent = 'Invalid email or password';
+                    document.getElementById('result').classList.remove('hidden');
+                }
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('result-text').textContent = 'Error: ' + error.message;
+                document.getElementById('result').classList.remove('hidden');
+            }
+        });
+        
+        // Initialize on load
+        initTestDB();
+    </script>
+</body>
+</html>

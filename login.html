@@ -7,8 +7,8 @@
     <meta name="description" content="Sign in to your MindVault account">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/database.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/database.js?v=2"></script>
+    <script src="js/auth.js?v=2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; }
@@ -293,6 +293,10 @@
 
         // Initialize database on page load
         initLoginDB();
+        
+        // Debug: Check for any global mindVaultDB
+        console.log('Global mindVaultDB exists:', typeof window.mindVaultDB);
+        console.log('Local loginDB will be:', typeof loginDB);
 
         // Form submission
         document.getElementById('login-form').addEventListener('submit', async function(e) {
