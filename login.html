@@ -298,7 +298,7 @@
                 console.log('Supabase client ready for login');
             } else {
                 console.error('Supabase client not initialized');
-                ErrorHandler.handle(new Error('Supabase not initialized'), 'Authentication system not ready');
+                // Just log the error, don't throw
             }
         }
         
