@@ -270,15 +270,29 @@
         let selectedPaymentMethod = null;
         let currentPlan = 'premium';
         let isAnnual = false;
-        const supabaseClient = window.supabaseClient;
+        let supabaseClient = null;
 
-        // Check if Supabase is initialized
-        if (!supabaseClient) {
-            console.error('Supabase client not initialized');
-            ErrorHandler.handle(new Error('Supabase not initialized'), 'Payment system not ready');
-        } else {
-            console.log('Supabase client ready for payment');
+        // Wait for Supabase client to be ready
+        async function waitForSupabase() {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            
+            while (!window.supabaseClient && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (window.supabaseClient) {
+                supabaseClient = window.supabaseClient;
+                console.log('Supabase client ready for payment');
+            } else {
+                console.error('Supabase client not initialized');
+                ErrorHandler.handle(new Error('Supabase not initialized'), 'Payment system not ready');
+            }
         }
+        
+        // Initialize when page loads
+        waitForSupabase();
 
         // Get plan details from URL parameters
         async function getPlanFromURL() {

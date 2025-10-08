@@ -460,6 +460,39 @@ class MindVaultSupabaseClient {
     }
 }
 
+// Initialize global Supabase client
+let supabaseClient = null;
+
+// Initialize Supabase client when DOM is ready
+document.addEventListener('DOMContentLoaded', async function() {
+    try {
+        // Check if Supabase config is available
+        if (typeof SUPABASE_CONFIG === 'undefined') {
+            console.error('SUPABASE_CONFIG not found. Make sure config.js is loaded.');
+            return;
+        }
+
+        // Check if Supabase library is loaded
+        if (typeof window.supabase === 'undefined') {
+            console.error('Supabase library not loaded. Make sure @supabase/supabase-js is included.');
+            return;
+        }
+
+        // Create Supabase client
+        supabaseClient = window.supabase.createClient(
+            SUPABASE_CONFIG.url,
+            SUPABASE_CONFIG.anonKey
+        );
+
+        // Make it globally available
+        window.supabaseClient = supabaseClient;
+        
+        console.log('Supabase client initialized successfully');
+    } catch (error) {
+        console.error('Failed to initialize Supabase client:', error);
+    }
+});
+
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = MindVaultSupabaseClient;

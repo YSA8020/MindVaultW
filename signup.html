@@ -620,10 +620,21 @@
         async function initDatabase() {
             try {
                 console.log('Starting Supabase initialization...');
-                supabaseClient = window.supabaseClient;
-                if (!supabaseClient) {
-                    throw new Error('Supabase client not initialized');
+                
+                // Wait for Supabase client to be ready
+                let attempts = 0;
+                const maxAttempts = 50; // 5 seconds max wait
+                
+                while (!window.supabaseClient && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
                 }
+                
+                if (!window.supabaseClient) {
+                    throw new Error('Supabase client failed to initialize');
+                }
+                
+                supabaseClient = window.supabaseClient;
                 console.log('Supabase client ready');
             } catch (error) {
                 console.error('Supabase initialization failed:', error);
