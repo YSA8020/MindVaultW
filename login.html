@@ -338,13 +338,46 @@
                 console.log('Auth successful:', authData.user.id);
                 
                 // Get user profile from database
-                const { data: userData, error: profileError } = await window.supabaseClient
+                let { data: userData, error: profileError } = await window.supabaseClient
                     .from('users')
                     .select('*')
                     .eq('id', authData.user.id)
                     .single();
                 
-                if (profileError) throw profileError;
+                // If profile doesn't exist, create it
+                if (profileError && profileError.code === 'PGRST116') {
+                    console.log('User profile not found, creating default profile...');
+                    
+                    // Create basic profile
+                    const { data: newProfile, error: createError } = await window.supabaseClient
+                        .from('users')
+                        .insert([{
+                            id: authData.user.id,
+                            email: authData.user.email,
+                            first_name: authData.user.user_metadata?.first_name || 'User',
+                            last_name: authData.user.user_metadata?.last_name || '',
+                            user_type: authData.user.user_metadata?.user_type || 'user',
+                            plan: 'basic',
+                            billing_cycle: 'monthly',
+                            newsletter_subscribed: false,
+                            payment_status: 'trial',
+                            trial_start: new Date().toISOString(),
+                            trial_end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
+                        }])
+                        .select()
+                        .single();
+                    
+                    if (createError) {
+                        console.error('Failed to create profile:', createError);
+                        throw new Error('Profile creation failed. Please contact support.');
+                    }
+                    
+                    // Use the newly created profile
+                    userData = newProfile;
+                    console.log('New profile created:', userData);
+                } else if (profileError) {
+                    throw profileError;
+                }
                 
                 console.log('User profile loaded:', userData);
                 
