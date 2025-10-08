@@ -476,45 +476,109 @@
                         <!-- Professional Specific Fields -->
                         <div id="professional-fields" class="hidden space-y-6">
                             <div class="border-t pt-6">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Professional Information</h3>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Professional Type</h3>
                                 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">License Type *</label>
-                                    <select name="licenseType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                                        <option value="">Select your license type</option>
-                                        <option value="lpc">Licensed Professional Counselor (LPC)</option>
-                                        <option value="lmft">Licensed Marriage and Family Therapist (LMFT)</option>
-                                        <option value="lcsw">Licensed Clinical Social Worker (LCSW)</option>
-                                        <option value="psychologist">Psychologist (PhD/PsyD)</option>
-                                        <option value="psychiatrist">Psychiatrist (MD/DO)</option>
-                                        <option value="other">Other Licensed Professional</option>
-                                    </select>
+                                <div class="space-y-4">
+                                    <!-- Professional Type Selection -->
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div class="professional-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectProfessionalType('licensed', this)">
+                                            <div class="flex items-center">
+                                                <input type="radio" name="professionalType" value="licensed" class="h-4 w-4 text-purple-600 focus:ring-purple-500">
+                                                <label class="ml-3">
+                                                    <div class="font-semibold text-gray-900">Licensed Counselor</div>
+                                                    <div class="text-sm text-gray-600">Mental Health Professional</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="professional-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectProfessionalType('peer-professional', this)">
+                                            <div class="flex items-center">
+                                                <input type="radio" name="professionalType" value="peer-professional" class="h-4 w-4 text-purple-600 focus:ring-purple-500">
+                                                <label class="ml-3">
+                                                    <div class="font-semibold text-gray-900">Peer Support Professional</div>
+                                                    <div class="text-sm text-gray-600">Certified Peer Specialist</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">License Number *</label>
-                                    <input type="text" name="licenseNumber" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Enter your professional license number">
+                            <!-- Licensed Counselor Fields -->
+                            <div id="licensed-professional-fields" class="hidden border-t pt-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Licensed Professional Information</h3>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">License Type *</label>
+                                        <select name="licenseType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                            <option value="">Select your license type</option>
+                                            <option value="lpc">Licensed Professional Counselor (LPC)</option>
+                                            <option value="lmft">Licensed Marriage and Family Therapist (LMFT)</option>
+                                            <option value="lcsw">Licensed Clinical Social Worker (LCSW)</option>
+                                            <option value="psychologist">Psychologist (PhD/PsyD)</option>
+                                            <option value="psychiatrist">Psychiatrist (MD/DO)</option>
+                                            <option value="other">Other Licensed Professional</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">License Number *</label>
+                                        <input type="text" name="licenseNumber" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Enter your professional license number">
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                                        <select name="yearsExperience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                            <option value="">Select experience level</option>
+                                            <option value="0-2">0-2 years</option>
+                                            <option value="3-5">3-5 years</option>
+                                            <option value="6-10">6-10 years</option>
+                                            <option value="10+">10+ years</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Specializations *</label>
+                                        <textarea name="specializations" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="E.g., Anxiety, Depression, PTSD, Family Therapy, etc."></textarea>
+                                    </div>
                                 </div>
+                            </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
-                                    <select name="yearsExperience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
-                                        <option value="">Select experience level</option>
-                                        <option value="0-2">0-2 years</option>
-                                        <option value="3-5">3-5 years</option>
-                                        <option value="6-10">6-10 years</option>
-                                        <option value="10+">10+ years</option>
-                                    </select>
-                                </div>
+                            <!-- Peer Support Professional Fields -->
+                            <div id="peer-professional-fields" class="hidden border-t pt-6">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Peer Support Professional Information</h3>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Support Group *</label>
+                                        <select name="preferredSupportGroup" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                            <option value="">Select a support group</option>
+                                            <option value="anxiety-stress">Anxiety & Stress</option>
+                                            <option value="depression">Depression Support</option>
+                                            <option value="lgbtq">LGBTQ+ Community</option>
+                                            <option value="student-life">Student Life</option>
+                                            <option value="addiction-recovery">Addiction Recovery</option>
+                                            <option value="trauma-survivors">Trauma Survivors</option>
+                                            <option value="caregivers">Caregivers</option>
+                                        </select>
+                                    </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Specializations</label>
-                                    <textarea name="specializations" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="E.g., Anxiety, Depression, PTSD, Family Therapy, etc."></textarea>
-                                </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                                        <select name="peerYearsExperience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                            <option value="">Select experience level</option>
+                                            <option value="0-2">0-2 years</option>
+                                            <option value="3-5">3-5 years</option>
+                                            <option value="6-10">6-10 years</option>
+                                            <option value="10+">10+ years</option>
+                                        </select>
+                                    </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Professional Bio (Optional)</label>
-                                    <textarea name="professionalBio" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Tell clients about your approach and experience..."></textarea>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Specializations *</label>
+                                        <textarea name="peerSpecializations" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="E.g., Recovery support, Crisis intervention, Community building, etc."></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -792,6 +856,42 @@
             console.log('=== selectUserType completed ===');
         }
 
+        // Global function for professional type selection
+        window.selectProfessionalType = function(type, element) {
+            console.log('=== selectProfessionalType called ===');
+            console.log('Professional Type:', type);
+            
+            // Remove selected class from all professional type cards
+            document.querySelectorAll('.professional-type-card').forEach(card => {
+                card.classList.remove('border-purple-500', 'bg-purple-50');
+                card.classList.add('border-gray-300');
+            });
+            
+            // Add selected class to clicked card
+            element.classList.remove('border-gray-300');
+            element.classList.add('border-purple-500', 'bg-purple-50');
+            
+            // Check the radio button
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+            }
+            
+            // Show/hide appropriate fields
+            const licensedFields = document.getElementById('licensed-professional-fields');
+            const peerProfessionalFields = document.getElementById('peer-professional-fields');
+            
+            if (type === 'licensed') {
+                licensedFields.classList.remove('hidden');
+                peerProfessionalFields.classList.add('hidden');
+            } else if (type === 'peer-professional') {
+                peerProfessionalFields.classList.remove('hidden');
+                licensedFields.classList.add('hidden');
+            }
+            
+            console.log('=== selectProfessionalType completed ===');
+        }
+
         // Initialize database on page load (don't wait for it)
         initDatabase();
         
@@ -990,25 +1090,45 @@
                     return;
                 }
                 
+                // Prepare profile data
+                const profileData = {
+                    id: authData.user.id,
+                    email: userData.email,
+                    first_name: userData.firstName,
+                    last_name: userData.lastName,
+                    user_type: userData.userType,
+                    plan: userData.plan,
+                    billing_cycle: userData.billing,
+                    support_group: userData.supportGroup,
+                    experience_level: userData.experienceLevel,
+                    journey: userData.journey,
+                    newsletter_subscribed: userData.newsletter,
+                    trial_start: new Date().toISOString(),
+                    trial_end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+                    payment_status: 'trial'
+                };
+
+                // Add professional fields if user is professional
+                if (userData.userType === 'professional') {
+                    profileData.professional_type = data.professionalType;
+                    profileData.verification_status = 'pending';
+                    
+                    if (data.professionalType === 'licensed') {
+                        profileData.license_type = data.licenseType;
+                        profileData.license_number = data.licenseNumber;
+                        profileData.years_experience = data.yearsExperience;
+                        profileData.specializations = data.specializations;
+                    } else if (data.professionalType === 'peer-professional') {
+                        profileData.preferred_support_group = data.preferredSupportGroup;
+                        profileData.years_experience = data.peerYearsExperience;
+                        profileData.specializations = data.peerSpecializations;
+                    }
+                }
+                
                 // Create user profile in database
-                const { data: profileData, error: profileError } = await window.supabaseClient
+                const { data: createdProfile, error: profileError } = await window.supabaseClient
                     .from('users')
-                    .insert([{
-                        id: authData.user.id,
-                        email: userData.email,
-                        first_name: userData.firstName,
-                        last_name: userData.lastName,
-                        user_type: userData.userType,
-                        plan: userData.plan,
-                        billing_cycle: userData.billing,
-                        support_group: userData.supportGroup,
-                        experience_level: userData.experienceLevel,
-                        journey: userData.journey,
-                        newsletter_subscribed: userData.newsletter,
-                        trial_start: new Date().toISOString(),
-                        trial_end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-                        payment_status: 'trial'
-                    }])
+                    .insert([profileData])
                     .select()
                     .single();
                 
@@ -1022,16 +1142,42 @@
                 localStorage.setItem('userName', userData.firstName);
                 localStorage.setItem('userEmail', userData.email);
                 
-                // Redirect based on plan (no alert needed)
-                setTimeout(() => {
-                    if (data.plan === 'basic') {
-                        // For basic plan, go directly to dashboard
-                        window.location.href = `dashboard-simple.html?plan=${data.plan}`;
-                    } else {
-                        // For premium/professional plans, go to payment
-                        window.location.href = `payment.html?plan=${data.plan}&billing=${isAnnual ? 'annual' : 'monthly'}`;
-                    }
-                }, 1000);
+                // Check if user is a professional (requires vetting)
+                if (userData.userType === 'professional') {
+                    // Show vetting message for professionals
+                    const vettingMessage = document.createElement('div');
+                    vettingMessage.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+                    vettingMessage.innerHTML = `
+                        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4">
+                            <div class="text-center">
+                                <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-2xl font-bold text-gray-900 mb-4">Application Received!</h3>
+                                <p class="text-gray-600 mb-6">
+                                    After successful vetting of details, an email will be sent for you to log into your account and follow necessary steps to be onboarded.
+                                </p>
+                                <button onclick="window.location.href='index.html'" class="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors font-semibold">
+                                    Back to Home
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(vettingMessage);
+                } else {
+                    // Regular users and peer supporters - redirect based on plan
+                    setTimeout(() => {
+                        if (data.plan === 'basic') {
+                            // For basic plan, go directly to dashboard
+                            window.location.href = `dashboard-simple.html?plan=${data.plan}`;
+                        } else {
+                            // For premium/professional plans, go to payment
+                            window.location.href = `payment.html?plan=${data.plan}&billing=${isAnnual ? 'annual' : 'monthly'}`;
+                        }
+                    }, 1000);
+                }
                 
             } catch (error) {
                 console.error('Error creating user:', error);
