@@ -882,6 +882,16 @@
                 if (authError) throw authError;
                 
                 console.log('Auth user created:', authData.user.id);
+                console.log('Auth user object:', authData.user);
+                console.log('Auth session:', authData.session);
+                
+                // Check if user needs email confirmation
+                if (authData.user && !authData.session) {
+                    console.warn('User created but not confirmed - email confirmation may be required');
+                    alert('Account created! Please check your email to confirm your account before signing in.');
+                    window.location.href = 'login.html';
+                    return;
+                }
                 
                 // Create user profile in database
                 const { data: profileData, error: profileError } = await window.supabaseClient
