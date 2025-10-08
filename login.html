@@ -281,7 +281,7 @@
     </div>
 
     <script>
-        let supabaseClient = null;
+        // supabaseClient is declared globally in supabase-client.js
         
         // Wait for Supabase client to be ready
         async function waitForSupabase() {
@@ -294,7 +294,7 @@
             }
             
             if (window.supabaseClient) {
-                supabaseClient = window.supabaseClient;
+                // supabaseClient is already global
                 console.log('Supabase client ready for login');
             } else {
                 console.error('Supabase client not initialized');
@@ -316,13 +316,13 @@
             
             // Authenticate with Supabase
             try {
-                if (!supabaseClient) {
+                if (!window.supabaseClient) {
                     alert('Authentication system not ready. Please wait a moment and try again.');
                     return;
                 }
                 
                 // Sign in with Supabase
-                const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+                const { data: authData, error: authError } = await window.supabaseClient.auth.signInWithPassword({
                     email: data.email,
                     password: data.password
                 });
@@ -332,7 +332,7 @@
                 console.log('Auth successful:', authData.user.id);
                 
                 // Get user profile from database
-                const { data: userData, error: profileError } = await supabaseClient
+                const { data: userData, error: profileError } = await window.supabaseClient
                     .from('users')
                     .select('*')
                     .eq('id', authData.user.id)
@@ -343,7 +343,7 @@
                 console.log('User profile loaded:', userData);
                 
                 // Update last login
-                await supabaseClient
+                await window.supabaseClient
                     .from('users')
                     .update({ last_login: new Date().toISOString() })
                     .eq('id', authData.user.id);

@@ -271,7 +271,7 @@
         let selectedPaymentMethod = null;
         let currentPlan = 'premium';
         let isAnnual = false;
-        let supabaseClient = null;
+        // supabaseClient is declared globally in supabase-client.js
 
         // Wait for Supabase client to be ready
         async function waitForSupabase() {
@@ -284,7 +284,7 @@
             }
             
             if (window.supabaseClient) {
-                supabaseClient = window.supabaseClient;
+                // supabaseClient is already global
                 console.log('Supabase client ready for payment');
             } else {
                 console.error('Supabase client not initialized');
@@ -303,9 +303,9 @@
             const userId = localStorage.getItem('userId');
             
             // Pre-fill billing information from Supabase
-            if (userId && supabaseClient) {
+            if (userId && window.supabaseClient) {
                 try {
-                    const { data: userData, error } = await supabaseClient
+                    const { data: userData, error } = await window.supabaseClient
                         .from('users')
                         .select('first_name, last_name, email')
                         .eq('id', userId)
@@ -383,8 +383,8 @@
             
             try {
                 // Update user payment status in Supabase
-                if (supabaseClient && userId) {
-                    const { error } = await supabaseClient
+                if (window.supabaseClient && userId) {
+                    const { error } = await window.supabaseClient
                         .from('users')
                         .update({
                             payment_method: selectedPaymentMethod,

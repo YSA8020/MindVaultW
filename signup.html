@@ -615,7 +615,7 @@
 
     <script>
         let selectedUserType = null;
-        let supabaseClient = null;
+        // supabaseClient is declared globally in supabase-client.js
 
         // Initialize Supabase when page loads
         async function initDatabase() {
@@ -636,7 +636,7 @@
                     return; // Don't throw error, just continue
                 }
                 
-                supabaseClient = window.supabaseClient;
+                window.supabaseClient = window.supabaseClient;
                 console.log('Supabase client ready');
             } catch (error) {
                 console.error('Supabase initialization failed:', error);
@@ -806,10 +806,10 @@
             e.preventDefault();
             
             console.log('Form submission triggered!');
-            console.log('Supabase status:', supabaseClient ? 'Ready' : 'Not ready');
+            console.log('Supabase status:', window.supabaseClient ? 'Ready' : 'Not ready');
             
             // Check if Supabase is ready
-            if (!supabaseClient) {
+            if (!window.supabaseClient) {
                 console.log('Supabase not ready, showing alert');
                 alert('Authentication system is not ready yet. Please wait a moment and try again.');
                 return;
@@ -867,7 +867,7 @@
                 
                 // Create auth user in Supabase
                 console.log('Creating Supabase auth user...');
-                const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                const { data: authData, error: authError } = await window.supabaseClient.auth.signUp({
                     email: userData.email,
                     password: userData.password,
                     options: {
@@ -884,7 +884,7 @@
                 console.log('Auth user created:', authData.user.id);
                 
                 // Create user profile in database
-                const { data: profileData, error: profileError } = await supabaseClient
+                const { data: profileData, error: profileError } = await window.supabaseClient
                     .from('users')
                     .insert([{
                         id: authData.user.id,
