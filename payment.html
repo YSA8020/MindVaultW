@@ -7,7 +7,10 @@
     <meta name="description" content="Complete your MindVault subscription payment">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/supabase-client.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; }
@@ -267,37 +270,39 @@
         let selectedPaymentMethod = null;
         let currentPlan = 'premium';
         let isAnnual = false;
-        let paymentDB = null;
+        const supabaseClient = window.supabaseClient;
 
-        // Initialize database
-        async function initPaymentDB() {
-            try {
-                paymentDB = new MindVaultDB();
-                await paymentDB.init();
-                console.log('Payment database initialized');
-            } catch (error) {
-                console.error('Payment database initialization failed:', error);
-            }
+        // Check if Supabase is initialized
+        if (!supabaseClient) {
+            console.error('Supabase client not initialized');
+            ErrorHandler.handle(new Error('Supabase not initialized'), 'Payment system not ready');
+        } else {
+            console.log('Supabase client ready for payment');
         }
 
-        // Initialize database on page load
-        initPaymentDB();
-
         // Get plan details from URL parameters
-        function getPlanFromURL() {
+        async function getPlanFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
             currentPlan = urlParams.get('plan') || 'premium';
             isAnnual = urlParams.get('billing') === 'annual';
-            const userId = urlParams.get('userId');
+            const userId = localStorage.getItem('userId');
             
-            // Pre-fill billing information if user data is available
-            if (userId) {
-                const userData = localStorage.getItem('userData');
-                if (userData) {
-                    const user = JSON.parse(userData);
-                    document.querySelector('input[name="firstName"]').value = user.firstName || '';
-                    document.querySelector('input[name="lastName"]').value = user.lastName || '';
-                    document.querySelector('input[name="email"]').value = user.email || '';
+            // Pre-fill billing information from Supabase
+            if (userId && supabaseClient) {
+                try {
+                    const { data: userData, error } = await supabaseClient
+                        .from('users')
+                        .select('first_name, last_name, email')
+                        .eq('id', userId)
+                        .single();
+                    
+                    if (!error && userData) {
+                        document.querySelector('input[name="firstName"]').value = userData.first_name || '';
+                        document.querySelector('input[name="lastName"]').value = userData.last_name || '';
+                        document.querySelector('input[name="email"]').value = userData.email || '';
+                    }
+                } catch (error) {
+                    console.error('Error loading user data:', error);
                 }
             }
             
@@ -358,33 +363,29 @@
             
             console.log('Payment data:', data);
             
-            // Get user ID from URL or localStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            const userId = urlParams.get('userId') || localStorage.getItem('userId');
+            // Get user ID from localStorage
+            const userId = localStorage.getItem('userId');
             
             try {
-                // Update user payment status in database
-                if (paymentDB && userId) {
-                    await paymentDB.updateUser(userId, {
-                        paymentMethod: selectedPaymentMethod,
-                        paymentCompleted: true,
-                        paymentDate: new Date().toISOString(),
-                        billingAddress: {
-                            firstName: data.firstName,
-                            lastName: data.lastName,
-                            email: data.email,
-                            address: data.address,
-                            city: data.city,
-                            state: data.state,
-                            zip: data.zip
-                        }
-                    });
+                // Update user payment status in Supabase
+                if (supabaseClient && userId) {
+                    const { error } = await supabaseClient
+                        .from('users')
+                        .update({
+                            payment_method: selectedPaymentMethod,
+                            payment_status: 'active',
+                            payment_date: new Date().toISOString(),
+                            billing_first_name: data.firstName,
+                            billing_last_name: data.lastName,
+                            billing_email: data.email,
+                            billing_address: data.address,
+                            billing_city: data.city,
+                            billing_state: data.state,
+                            billing_zip: data.zip
+                        })
+                        .eq('id', userId);
                     
-                    // Update localStorage
-                    const userData = JSON.parse(localStorage.getItem('userData') || '{}');
-                    userData.paymentCompleted = true;
-                    userData.paymentMethod = selectedPaymentMethod;
-                    localStorage.setItem('userData', JSON.stringify(userData));
+                    if (error) throw error;
                 }
                 
                 // Here you would integrate with payment processor (Stripe, PayPal, etc.)
@@ -397,7 +398,7 @@
                 
             } catch (error) {
                 console.error('Error processing payment:', error);
-                alert('There was an error processing your payment. Please try again.');
+                ErrorHandler.handle(error, 'Failed to process payment');
             }
         });
 

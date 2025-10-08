@@ -7,8 +7,10 @@
     <meta name="description" content="Your personal mental health dashboard">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/database.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/error-handler.js"></script>
+    <script src="js/supabase-client.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; }
@@ -192,17 +194,13 @@
     <script>
         let currentPlan = 'premium';
         let trialDaysRemaining = 11;
-        let dashboardDB = null;
+        const supabaseClient = window.supabaseClient;
 
-        // Initialize database
-        async function initDashboardDB() {
-            try {
-                dashboardDB = new MindVaultDB();
-                await dashboardDB.init();
-                console.log('Dashboard database initialized');
-            } catch (error) {
-                console.error('Dashboard database initialization failed:', error);
-            }
+        // Check if Supabase is initialized
+        if (!supabaseClient) {
+            console.error('Supabase client not initialized');
+        } else {
+            console.log('Supabase client ready for dashboard');
         }
 
         // Initialize dashboard
