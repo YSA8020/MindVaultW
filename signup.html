@@ -810,32 +810,37 @@
             
             // Check if Supabase is ready
             if (!window.supabaseClient) {
-                console.log('Supabase not ready, showing alert');
-                alert('Authentication system is not ready yet. Please wait a moment and try again.');
+                console.log('Supabase not ready');
+                // Show error in form instead of alert
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+                errorDiv.textContent = 'Authentication system is not ready yet. Please wait a moment and try again.';
+                document.getElementById('registration-form').insertBefore(errorDiv, document.getElementById('registration-form').firstChild);
+                setTimeout(() => errorDiv.remove(), 5000);
                 return;
             }
             
             const formData = new FormData(this);
             const data = Object.fromEntries(formData);
             
-            // Basic validation
+            // Basic validation (errors will show inline via HTML5 validation)
             if (data.password !== data.confirmPassword) {
-                alert('Passwords do not match');
+                console.error('Passwords do not match');
                 return;
             }
             
             if (data.password.length < 8) {
-                alert('Password must be at least 8 characters long');
+                console.error('Password must be at least 8 characters long');
                 return;
             }
             
             if (!data.plan) {
-                alert('Please select a plan');
+                console.error('Please select a plan');
                 return;
             }
             
             if (!selectedUserType) {
-                alert('Please select a user type first');
+                console.error('Please select a user type first');
                 return;
             }
             
@@ -888,7 +893,7 @@
                 // Check if user needs email confirmation
                 if (authData.user && !authData.session) {
                     console.warn('User created but not confirmed - email confirmation may be required');
-                    alert('Account created! Please check your email to confirm your account before signing in.');
+                    // Redirect directly to login without alert
                     window.location.href = 'login.html';
                     return;
                 }
@@ -925,10 +930,7 @@
                 localStorage.setItem('userName', userData.firstName);
                 localStorage.setItem('userEmail', userData.email);
                 
-                // Show success message
-                alert('Account created successfully! Redirecting...');
-                
-                // Redirect based on plan
+                // Redirect based on plan (no alert needed)
                 setTimeout(() => {
                     if (data.plan === 'basic') {
                         // For basic plan, go directly to dashboard
@@ -948,14 +950,21 @@
                     hint: error.hint
                 });
                 
+                // Show error message inline instead of alert
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+                
                 if (error.message && error.message.includes('already registered')) {
-                    alert('An account with this email already exists. Please try logging in instead.');
+                    errorDiv.textContent = 'An account with this email already exists. Please try logging in instead.';
                 } else if (error.code === 'PGRST205') {
-                    alert('Database table not found. Please check if the users table was created in Supabase.');
+                    errorDiv.textContent = 'Database table not found. Please contact support.';
                 } else {
-                    console.error('Failed to create account:', error);
-                    alert(`Failed to create account: ${error.message || 'Unknown error'}. Please try again.`);
+                    errorDiv.textContent = `Failed to create account: ${error.message || 'Unknown error'}. Please try again.`;
                 }
+                
+                const form = document.getElementById('registration-form');
+                form.insertBefore(errorDiv, form.firstChild);
+                setTimeout(() => errorDiv.remove(), 5000);
             }
         });
 

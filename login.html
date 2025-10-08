@@ -317,7 +317,13 @@
             // Authenticate with Supabase
             try {
                 if (!window.supabaseClient) {
-                    alert('Authentication system not ready. Please wait a moment and try again.');
+                    console.error('Authentication system not ready');
+                    // Show error inline
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+                    errorDiv.textContent = 'Authentication system not ready. Please wait a moment and try again.';
+                    document.querySelector('form').insertBefore(errorDiv, document.querySelector('form').firstChild);
+                    setTimeout(() => errorDiv.remove(), 5000);
                     return;
                 }
                 
@@ -363,11 +369,19 @@
                 window.location.href = `dashboard-simple.html?plan=${userData.plan}&days=${Math.max(0, remainingDays)}`;
             } catch (error) {
                 console.error('Login error:', error);
+                // Show error inline instead of alert
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+                
                 if (error.message && error.message.includes('Invalid login credentials')) {
-                    alert('Invalid email or password. Please try again.');
+                    errorDiv.textContent = 'Invalid email or password. Please try again.';
                 } else {
-                    ErrorHandler.handle(error, 'Login failed');
+                    errorDiv.textContent = 'Login failed. Please try again.';
                 }
+                
+                const form = document.querySelector('form');
+                form.insertBefore(errorDiv, form.firstChild);
+                setTimeout(() => errorDiv.remove(), 5000);
             }
         });
 

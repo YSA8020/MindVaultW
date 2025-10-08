@@ -369,7 +369,13 @@
             e.preventDefault();
             
             if (!selectedPaymentMethod) {
-                alert('Please select a payment method');
+                console.error('Please select a payment method');
+                // Show error inline
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4';
+                errorDiv.textContent = 'Please select a payment method';
+                document.querySelector('form').insertBefore(errorDiv, document.querySelector('form').firstChild);
+                setTimeout(() => errorDiv.remove(), 5000);
                 return;
             }
             
@@ -404,9 +410,7 @@
                 }
                 
                 // Here you would integrate with payment processor (Stripe, PayPal, etc.)
-                alert('Payment processed successfully! Redirecting to dashboard...');
-                
-                // Redirect to dashboard
+                // Redirect to dashboard without alert
                 setTimeout(() => {
                     window.location.href = 'dashboard-simple.html?payment=success&plan=' + currentPlan;
                 }, 1000);
