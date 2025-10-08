@@ -2,11 +2,11 @@
 // Replace these with your actual Supabase project credentials
 
 const SUPABASE_CONFIG = {
-    // Your Supabase project URL - REPLACE WITH YOUR ACTUAL URL
-    url: 'https://your-project-id.supabase.co', // Replace with your actual Supabase URL
+    // Your Supabase project URL
+    url: 'https://swacnbyayimigfzgzgvm.supabase.co',
     
-    // Your Supabase anon key - REPLACE WITH YOUR ACTUAL KEY
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...', // Replace with your actual anon key
+    // Your Supabase anon key
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3YWNuYnlheWltaWdmemd6Z3ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MDMzNjcsImV4cCI6MjA3NTQ3OTM2N30.5AKdysWwZkB_YVGTQl3eDqhgfcpRio0hTnjFo6rloZA',
     
     // Optional: Service role key for admin operations (keep this secret!)
     serviceKey: 'YOUR_SUPABASE_SERVICE_KEY' // Only use server-side!
