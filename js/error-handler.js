@@ -308,9 +308,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Create global ErrorHandler instance
+const ErrorHandler = new MindVaultErrorHandler();
+
+// Initialize ErrorHandler
+ErrorHandler.init();
+
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = MindVaultErrorHandler;
+    module.exports = { MindVaultErrorHandler, ErrorHandler };
 } else {
     window.MindVaultErrorHandler = MindVaultErrorHandler;
+    window.ErrorHandler = ErrorHandler;
 }
