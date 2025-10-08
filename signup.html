@@ -931,11 +931,20 @@
                 
             } catch (error) {
                 console.error('Error creating user:', error);
+                console.error('Error details:', {
+                    code: error.code,
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint
+                });
+                
                 if (error.message && error.message.includes('already registered')) {
                     alert('An account with this email already exists. Please try logging in instead.');
+                } else if (error.code === 'PGRST205') {
+                    alert('Database table not found. Please check if the users table was created in Supabase.');
                 } else {
                     console.error('Failed to create account:', error);
-                    alert('Failed to create account. Please try again.');
+                    alert(`Failed to create account: ${error.message || 'Unknown error'}. Please try again.`);
                 }
             }
         });
