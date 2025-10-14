@@ -880,6 +880,7 @@
             const radio = element.querySelector('input[type="radio"]');
             if (radio) {
                 radio.checked = true;
+                console.log('Radio button checked:', radio.value);
             }
             
             // Show/hide appropriate fields
@@ -893,22 +894,28 @@
                 if (licensedFields) {
                     licensedFields.classList.remove('hidden');
                     licensedFields.style.display = 'block';
-                    console.log('Showing licensed fields');
+                    licensedFields.style.visibility = 'visible';
+                    console.log('Showing licensed fields - classes:', licensedFields.className);
+                    console.log('Showing licensed fields - style.display:', licensedFields.style.display);
                 }
                 if (peerProfessionalFields) {
                     peerProfessionalFields.classList.add('hidden');
                     peerProfessionalFields.style.display = 'none';
+                    peerProfessionalFields.style.visibility = 'hidden';
                     console.log('Hiding peer professional fields');
                 }
             } else if (type === 'peer-professional') {
                 if (peerProfessionalFields) {
                     peerProfessionalFields.classList.remove('hidden');
                     peerProfessionalFields.style.display = 'block';
-                    console.log('Showing peer professional fields');
+                    peerProfessionalFields.style.visibility = 'visible';
+                    console.log('Showing peer professional fields - classes:', peerProfessionalFields.className);
+                    console.log('Showing peer professional fields - style.display:', peerProfessionalFields.style.display);
                 }
                 if (licensedFields) {
                     licensedFields.classList.add('hidden');
                     licensedFields.style.display = 'none';
+                    licensedFields.style.visibility = 'hidden';
                     console.log('Hiding licensed fields');
                 }
             }
@@ -947,6 +954,37 @@
                 }
             };
             document.body.appendChild(testButton);
+            
+            // Add a test button for professional fields
+            const testProfessionalButton = document.createElement('button');
+            testProfessionalButton.textContent = 'TEST: Professional Fields';
+            testProfessionalButton.style.cssText = 'position: fixed; top: 60px; right: 10px; z-index: 9999; background: purple; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;';
+            testProfessionalButton.onclick = function() {
+                console.log('Professional test button clicked');
+                const professionalFields = document.getElementById('professional-fields');
+                const licensedFields = document.getElementById('licensed-professional-fields');
+                const peerProfessionalFields = document.getElementById('peer-professional-fields');
+                
+                if (professionalFields) {
+                    professionalFields.classList.remove('hidden');
+                    professionalFields.style.display = 'block';
+                    console.log('Professional fields shown via test button');
+                }
+                
+                if (licensedFields) {
+                    console.log('Testing licensed fields directly...');
+                    licensedFields.classList.remove('hidden');
+                    licensedFields.style.display = 'block';
+                    licensedFields.style.visibility = 'visible';
+                    console.log('Licensed fields shown directly - classes:', licensedFields.className);
+                    console.log('Licensed fields shown directly - style:', licensedFields.style.cssText);
+                }
+                
+                if (peerProfessionalFields) {
+                    console.log('Peer professional fields element found:', peerProfessionalFields);
+                }
+            };
+            document.body.appendChild(testProfessionalButton);
             
             userTypeCards.forEach((card, index) => {
                 console.log(`Card ${index}:`, card);
