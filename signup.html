@@ -840,6 +840,16 @@
             } else if (type === 'professional') {
                 professionalFields.classList.remove('hidden');
                 peerFields.classList.add('hidden');
+                
+                // Force show professional type selection cards
+                const professionalTypeCards = professionalFields.querySelector('.grid');
+                if (professionalTypeCards) {
+                    professionalTypeCards.style.display = 'grid';
+                    professionalTypeCards.classList.remove('hidden');
+                    console.log('Professional type cards should now be visible');
+                }
+                
+                console.log('Professional fields should now be visible');
             } else {
                 peerFields.classList.add('hidden');
                 professionalFields.classList.add('hidden');
@@ -860,6 +870,7 @@
         window.selectProfessionalType = function(type, element) {
             console.log('=== selectProfessionalType called ===');
             console.log('Professional Type:', type);
+            console.log('Element clicked:', element);
             
             // Remove selected class from all professional type cards
             document.querySelectorAll('.professional-type-card').forEach(card => {
@@ -881,12 +892,29 @@
             const licensedFields = document.getElementById('licensed-professional-fields');
             const peerProfessionalFields = document.getElementById('peer-professional-fields');
             
+            console.log('Licensed fields element:', licensedFields);
+            console.log('Peer professional fields element:', peerProfessionalFields);
+            
             if (type === 'licensed') {
-                licensedFields.classList.remove('hidden');
-                peerProfessionalFields.classList.add('hidden');
+                if (licensedFields) {
+                    licensedFields.classList.remove('hidden');
+                    licensedFields.style.display = 'block';
+                    console.log('Showing licensed fields');
+                }
+                if (peerProfessionalFields) {
+                    peerProfessionalFields.classList.add('hidden');
+                    console.log('Hiding peer professional fields');
+                }
             } else if (type === 'peer-professional') {
-                peerProfessionalFields.classList.remove('hidden');
-                licensedFields.classList.add('hidden');
+                if (peerProfessionalFields) {
+                    peerProfessionalFields.classList.remove('hidden');
+                    peerProfessionalFields.style.display = 'block';
+                    console.log('Showing peer professional fields');
+                }
+                if (licensedFields) {
+                    licensedFields.classList.add('hidden');
+                    console.log('Hiding licensed fields');
+                }
             }
             
             console.log('=== selectProfessionalType completed ===');
