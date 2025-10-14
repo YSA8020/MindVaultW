@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Professional Test - MindVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Professional Signup Test</h1>
+        
+        <!-- User Type Selection -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Select User Type</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="user-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-blue-500 transition-all" onclick="selectUserType('regular', this)">
+                    <h3 class="font-semibold text-gray-900">Regular User</h3>
+                    <p class="text-sm text-gray-600">Basic mental health support</p>
+                </div>
+                <div class="user-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-green-500 transition-all" onclick="selectUserType('peer', this)">
+                    <h3 class="font-semibold text-gray-900">Peer Supporter</h3>
+                    <p class="text-sm text-gray-600">Help others with lived experience</p>
+                </div>
+                <div class="user-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectUserType('professional', this)">
+                    <h3 class="font-semibold text-gray-900">Professional</h3>
+                    <p class="text-sm text-gray-600">Licensed counselor or peer professional</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Type Selection (Initially Hidden) -->
+        <div id="professional-fields" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Professional Type</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="professional-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectProfessionalType('licensed', this)">
+                    <div class="flex items-center">
+                        <input type="radio" name="professionalType" value="licensed" class="h-4 w-4 text-purple-600 focus:ring-purple-500">
+                        <label class="ml-3">
+                            <div class="font-semibold text-gray-900">Licensed Counselor</div>
+                            <div class="text-sm text-gray-600">Mental Health Professional</div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="professional-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectProfessionalType('peer-professional', this)">
+                    <div class="flex items-center">
+                        <input type="radio" name="professionalType" value="peer-professional" class="h-4 w-4 text-purple-600 focus:ring-purple-500">
+                        <label class="ml-3">
+                            <div class="font-semibold text-gray-900">Peer Support Professional</div>
+                            <div class="text-sm text-gray-600">Certified Peer Specialist</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Licensed Professional Fields -->
+        <div id="licensed-professional-fields" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Licensed Professional Information</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">License Type *</label>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select your license type</option>
+                        <option value="lpc">Licensed Professional Counselor (LPC)</option>
+                        <option value="lmft">Licensed Marriage and Family Therapist (LMFT)</option>
+                        <option value="lcsw">Licensed Clinical Social Worker (LCSW)</option>
+                        <option value="psychologist">Psychologist (PhD/PsyD)</option>
+                        <option value="psychiatrist">Psychiatrist (MD/DO)</option>
+                        <option value="other">Other Licensed Professional</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">License Number *</label>
+                    <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Enter your professional license number">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select experience level</option>
+                        <option value="0-2">0-2 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="6-10">6-10 years</option>
+                        <option value="10+">10+ years</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Specializations *</label>
+                    <textarea rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="E.g., Anxiety, Depression, PTSD, Family Therapy, etc."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Peer Professional Fields -->
+        <div id="peer-professional-fields" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Peer Support Professional Information</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Support Group *</label>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select a support group</option>
+                        <option value="anxiety-stress">Anxiety & Stress</option>
+                        <option value="depression">Depression Support</option>
+                        <option value="lgbtq">LGBTQ+ Community</option>
+                        <option value="student-life">Student Life</option>
+                        <option value="addiction-recovery">Addiction Recovery</option>
+                        <option value="trauma-survivors">Trauma Survivors</option>
+                        <option value="caregivers">Caregivers</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select experience level</option>
+                        <option value="0-2">0-2 years</option>
+                        <option value="3-5">3-5 years</option>
+                        <option value="6-10">6-10 years</option>
+                        <option value="10+">10+ years</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Specializations *</label>
+                    <textarea rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="E.g., Recovery support, Crisis intervention, Community building, etc."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Info -->
+        <div class="bg-gray-800 text-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Debug Console</h3>
+            <div id="debug-console" class="text-sm font-mono space-y-1">
+                <div>Ready to test...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedUserType = null;
+
+        function log(message) {
+            const console = document.getElementById('debug-console');
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(div);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function selectUserType(type, element) {
+            log(`=== selectUserType called: ${type} ===`);
+            selectedUserType = type;
+            
+            // Remove selected class from all cards
+            document.querySelectorAll('.user-type-card').forEach(card => {
+                card.classList.remove('border-blue-500', 'border-green-500', 'border-purple-500', 'bg-blue-50', 'bg-green-50', 'bg-purple-50');
+                card.classList.add('border-gray-300');
+            });
+            
+            // Add selected class to clicked card
+            element.classList.remove('border-gray-300');
+            if (type === 'regular') {
+                element.classList.add('border-blue-500', 'bg-blue-50');
+            } else if (type === 'peer') {
+                element.classList.add('border-green-500', 'bg-green-50');
+            } else if (type === 'professional') {
+                element.classList.add('border-purple-500', 'bg-purple-50');
+            }
+            
+            // Show/hide professional fields
+            const professionalFields = document.getElementById('professional-fields');
+            const licensedFields = document.getElementById('licensed-professional-fields');
+            const peerProfessionalFields = document.getElementById('peer-professional-fields');
+            
+            if (type === 'professional') {
+                log('Showing professional fields');
+                professionalFields.classList.remove('hidden');
+                professionalFields.style.display = 'block';
+            } else {
+                log('Hiding professional fields');
+                professionalFields.classList.add('hidden');
+                licensedFields.classList.add('hidden');
+                peerProfessionalFields.classList.add('hidden');
+            }
+            
+            log(`=== selectUserType completed: ${type} ===`);
+        }
+
+        function selectProfessionalType(type, element) {
+            log(`=== selectProfessionalType called: ${type} ===`);
+            
+            // Remove selected class from all professional type cards
+            document.querySelectorAll('.professional-type-card').forEach(card => {
+                card.classList.remove('border-purple-500', 'bg-purple-50');
+                card.classList.add('border-gray-300');
+            });
+            
+            // Add selected class to clicked card
+            element.classList.remove('border-gray-300');
+            element.classList.add('border-purple-500', 'bg-purple-50');
+            
+            // Check the radio button
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                log(`Radio button checked: ${radio.value}`);
+            }
+            
+            // Show/hide appropriate fields
+            const licensedFields = document.getElementById('licensed-professional-fields');
+            const peerProfessionalFields = document.getElementById('peer-professional-fields');
+            
+            log(`Licensed fields element: ${licensedFields ? 'found' : 'not found'}`);
+            log(`Peer professional fields element: ${peerProfessionalFields ? 'found' : 'not found'}`);
+            
+            if (type === 'licensed') {
+                if (licensedFields) {
+                    licensedFields.classList.remove('hidden');
+                    licensedFields.style.display = 'block';
+                    log('Showing licensed fields');
+                }
+                if (peerProfessionalFields) {
+                    peerProfessionalFields.classList.add('hidden');
+                    log('Hiding peer professional fields');
+                }
+            } else if (type === 'peer-professional') {
+                if (peerProfessionalFields) {
+                    peerProfessionalFields.classList.remove('hidden');
+                    peerProfessionalFields.style.display = 'block';
+                    log('Showing peer professional fields');
+                }
+                if (licensedFields) {
+                    licensedFields.classList.add('hidden');
+                    log('Hiding licensed fields');
+                }
+            }
+            
+            log(`=== selectProfessionalType completed: ${type} ===`);
+        }
+
+        // Initialize
+        log('Page loaded - ready for testing');
+    </script>
+</body>
+</html>
