@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Professional Signup - MindVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .test-pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .test-fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .test-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Professional Signup Test</h1>
+        
+        <div id="test-results" class="space-y-4 mb-8">
+            <!-- Test results will be populated here -->
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Quick Test Links</h2>
+            <div class="space-y-4">
+                <a href="signup.html" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+                    Test Professional Signup Page
+                </a>
+                <a href="index.html" class="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                    Back to Home
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 mt-6">
+            <h2 class="text-xl font-semibold mb-4">Test Checklist</h2>
+            <div class="space-y-2">
+                <div class="flex items-center">
+                    <input type="checkbox" id="test1" class="mr-3">
+                    <label for="test1">Professional user type card appears (purple theme)</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="test2" class="mr-3">
+                    <label for="test2">Clicking Professional shows two professional type options</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="test3" class="mr-3">
+                    <label for="test3">Licensed Counselor fields appear when selected</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="test4" class="mr-3">
+                    <label for="test4">Peer Support Professional fields appear when selected</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="test5" class="mr-3">
+                    <label for="test5">Form validation works for required fields</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="test6" class="mr-3">
+                    <label for="test6">Vetting message appears after submission</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" id="test7" class="mr-3">
+                    <label for="test7">No JavaScript errors in console</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test professional signup functionality
+        function runTests() {
+            const results = document.getElementById('test-results');
+            
+            // Test 1: Check if signup page loads
+            fetch('signup.html')
+                .then(response => {
+                    if (response.ok) {
+                        addTestResult('✅ Signup page loads successfully', 'pass');
+                    } else {
+                        addTestResult('❌ Signup page failed to load', 'fail');
+                    }
+                })
+                .catch(error => {
+                    addTestResult('❌ Error loading signup page: ' + error.message, 'fail');
+                });
+
+            // Test 2: Check if scripts are accessible
+            const scripts = [
+                'js/supabase-config.js',
+                'js/config.js',
+                'js/error-handler.js',
+                'js/supabase-client.js'
+            ];
+
+            scripts.forEach(script => {
+                fetch(script)
+                    .then(response => {
+                        if (response.ok) {
+                            addTestResult(`✅ ${script} is accessible`, 'pass');
+                        } else {
+                            addTestResult(`❌ ${script} failed to load`, 'fail');
+                        }
+                    })
+                    .catch(error => {
+                        addTestResult(`❌ Error loading ${script}: ${error.message}`, 'fail');
+                    });
+            });
+
+            // Test 3: Check database schema (if Supabase is configured)
+            if (typeof SUPABASE_CONFIG !== 'undefined') {
+                addTestResult('✅ Supabase configuration found', 'pass');
+            } else {
+                addTestResult('⚠️ Supabase configuration not found (will be loaded on signup page)', 'info');
+            }
+        }
+
+        function addTestResult(message, type) {
+            const results = document.getElementById('test-results');
+            const div = document.createElement('div');
+            div.className = `test-result test-${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        // Run tests when page loads
+        document.addEventListener('DOMContentLoaded', runTests);
+    </script>
+</body>
+</html>
