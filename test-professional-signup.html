@@ -5,126 +5,278 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Professional Signup - MindVault</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .test-pass { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .test-fail { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .test-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-    </style>
 </head>
 <body class="bg-gray-100 p-8">
     <div class="max-w-4xl mx-auto">
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">Professional Signup Test</h1>
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Test Professional Signup</h1>
         
-        <div id="test-results" class="space-y-4 mb-8">
-            <!-- Test results will be populated here -->
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-xl font-semibold mb-4">Quick Test Links</h2>
-            <div class="space-y-4">
-                <a href="signup.html" class="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
-                    Test Professional Signup Page
-                </a>
-                <a href="index.html" class="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
-                    Back to Home
-                </a>
+        <!-- User Type Selection -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Step 1: Select User Type</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="user-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-indigo-500 transition-all" onclick="selectUserType('individual', this)">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">👤</div>
+                        <div class="font-semibold text-gray-900">Individual</div>
+                        <div class="text-sm text-gray-600">Personal mental health tracking</div>
+                    </div>
+                </div>
+                
+                <div class="user-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-green-500 transition-all" onclick="selectUserType('peer', this)">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">🤝</div>
+                        <div class="font-semibold text-gray-900">Peer Support</div>
+                        <div class="text-sm text-gray-600">Connect with others like you</div>
+                    </div>
+                </div>
+                
+                <div class="user-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectUserType('professional', this)">
+                    <div class="text-center">
+                        <div class="text-2xl mb-2">👨‍⚕️</div>
+                        <div class="font-semibold text-gray-900">Professional</div>
+                        <div class="text-sm text-gray-600">Counselor or Mental Health Professional</div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6 mt-6">
-            <h2 class="text-xl font-semibold mb-4">Test Checklist</h2>
-            <div class="space-y-2">
-                <div class="flex items-center">
-                    <input type="checkbox" id="test1" class="mr-3">
-                    <label for="test1">Professional user type card appears (purple theme)</label>
+        <!-- Professional Fields -->
+        <div id="professional-fields" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Step 2: Professional Type</h2>
+            
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="professional-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectProfessionalType('licensed', this)">
+                        <div class="flex items-center">
+                            <input type="radio" name="professionalType" value="licensed" class="h-4 w-4 text-purple-600 focus:ring-purple-500">
+                            <label class="ml-3">
+                                <div class="font-semibold text-gray-900">Licensed Counselor</div>
+                                <div class="text-sm text-gray-600">Mental Health Professional</div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="professional-type-card border-2 border-gray-300 rounded-lg p-4 cursor-pointer hover:border-purple-500 transition-all" onclick="selectProfessionalType('peer-professional', this)">
+                        <div class="flex items-center">
+                            <input type="radio" name="professionalType" value="peer-professional" class="h-4 w-4 text-purple-600 focus:ring-purple-500">
+                            <label class="ml-3">
+                                <div class="font-semibold text-gray-900">Peer Support Professional</div>
+                                <div class="text-sm text-gray-600">Certified Peer Specialist</div>
+                            </label>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="test2" class="mr-3">
-                    <label for="test2">Clicking Professional shows two professional type options</label>
+            </div>
+        </div>
+
+        <!-- Licensed Professional Fields -->
+        <div id="licensed-professional-fields" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Licensed Professional Information</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">License Type *</label>
+                    <select name="licenseType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select License Type</option>
+                        <option value="LCSW">LCSW (Licensed Clinical Social Worker)</option>
+                        <option value="LMFT">LMFT (Licensed Marriage and Family Therapist)</option>
+                        <option value="LPC">LPC (Licensed Professional Counselor)</option>
+                        <option value="LPCC">LPCC (Licensed Professional Clinical Counselor)</option>
+                        <option value="LCPC">LCPC (Licensed Clinical Professional Counselor)</option>
+                        <option value="LCMHC">LCMHC (Licensed Clinical Mental Health Counselor)</option>
+                        <option value="LISW">LISW (Licensed Independent Social Worker)</option>
+                        <option value="LMHC">LMHC (Licensed Mental Health Counselor)</option>
+                        <option value="LADC">LADC (Licensed Alcohol and Drug Counselor)</option>
+                        <option value="LPAT">LPAT (Licensed Professional Art Therapist)</option>
+                        <option value="LMFT-A">LMFT-A (Licensed Marriage and Family Therapist Associate)</option>
+                        <option value="LPC-A">LPC-A (Licensed Professional Counselor Associate)</option>
+                        <option value="LCSW-A">LCSW-A (Licensed Clinical Social Worker Associate)</option>
+                        <option value="other">Other</option>
+                    </select>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="test3" class="mr-3">
-                    <label for="test3">Licensed Counselor fields appear when selected</label>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">License Number *</label>
+                    <input type="text" name="licenseNumber" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Enter your license number">
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="test4" class="mr-3">
-                    <label for="test4">Peer Support Professional fields appear when selected</label>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                    <select name="yearsExperience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select Years of Experience</option>
+                        <option value="0-1">0-1 years</option>
+                        <option value="2-5">2-5 years</option>
+                        <option value="6-10">6-10 years</option>
+                        <option value="11-15">11-15 years</option>
+                        <option value="16-20">16-20 years</option>
+                        <option value="20+">20+ years</option>
+                    </select>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="test5" class="mr-3">
-                    <label for="test5">Form validation works for required fields</label>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Specializations</label>
+                    <textarea name="specializations" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="List your areas of specialization (e.g., anxiety, depression, trauma, couples therapy)"></textarea>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="test6" class="mr-3">
-                    <label for="test6">Vetting message appears after submission</label>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Professional Bio</label>
+                    <textarea name="professionalBio" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Tell us about your professional background and approach"></textarea>
                 </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="test7" class="mr-3">
-                    <label for="test7">No JavaScript errors in console</label>
+            </div>
+        </div>
+
+        <!-- Peer Professional Fields -->
+        <div id="peer-professional-fields" class="hidden bg-white rounded-lg shadow p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Peer Support Professional Information</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preferred Support Group *</label>
+                    <select name="supportGroup" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select Preferred Support Group</option>
+                        <option value="anxiety">Anxiety Support</option>
+                        <option value="depression">Depression Support</option>
+                        <option value="bipolar">Bipolar Support</option>
+                        <option value="ptsd">PTSD Support</option>
+                        <option value="addiction">Addiction Recovery</option>
+                        <option value="eating-disorders">Eating Disorders</option>
+                        <option value="grief">Grief and Loss</option>
+                        <option value="lgbtq">LGBTQ+ Support</option>
+                        <option value="veterans">Veterans Support</option>
+                        <option value="general">General Mental Health</option>
+                    </select>
                 </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience *</label>
+                    <select name="yearsExperience" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        <option value="">Select Years of Experience</option>
+                        <option value="0-1">0-1 years</option>
+                        <option value="2-5">2-5 years</option>
+                        <option value="6-10">6-10 years</option>
+                        <option value="11-15">11-15 years</option>
+                        <option value="16-20">16-20 years</option>
+                        <option value="20+">20+ years</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Professional Bio</label>
+                    <textarea name="professionalBio" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Tell us about your lived experience and how you help others"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Console -->
+        <div class="bg-gray-800 text-white rounded-lg shadow p-6">
+            <h3 class="text-lg font-semibold mb-4">Debug Console</h3>
+            <div id="debug-console" class="text-sm font-mono space-y-1 h-40 overflow-y-auto">
+                <div>Ready to test...</div>
             </div>
         </div>
     </div>
 
     <script>
-        // Test professional signup functionality
-        function runTests() {
-            const results = document.getElementById('test-results');
-            
-            // Test 1: Check if signup page loads
-            fetch('signup.html')
-                .then(response => {
-                    if (response.ok) {
-                        addTestResult('✅ Signup page loads successfully', 'pass');
-                    } else {
-                        addTestResult('❌ Signup page failed to load', 'fail');
-                    }
-                })
-                .catch(error => {
-                    addTestResult('❌ Error loading signup page: ' + error.message, 'fail');
-                });
+        function log(message) {
+            const console = document.getElementById('debug-console');
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(div);
+            console.scrollTop = console.scrollHeight;
+        }
 
-            // Test 2: Check if scripts are accessible
-            const scripts = [
-                'js/supabase-config.js',
-                'js/config.js',
-                'js/error-handler.js',
-                'js/supabase-client.js'
-            ];
+        function selectUserType(type, element) {
+            log('=== selectUserType called ===');
+            log('User Type: ' + type);
+            log('Element clicked: ' + element.className);
 
-            scripts.forEach(script => {
-                fetch(script)
-                    .then(response => {
-                        if (response.ok) {
-                            addTestResult(`✅ ${script} is accessible`, 'pass');
-                        } else {
-                            addTestResult(`❌ ${script} failed to load`, 'fail');
-                        }
-                    })
-                    .catch(error => {
-                        addTestResult(`❌ Error loading ${script}: ${error.message}`, 'fail');
-                    });
+            // Remove selected class from all user type cards
+            document.querySelectorAll('.user-type-card').forEach(card => {
+                card.classList.remove('border-indigo-500', 'border-green-500', 'border-purple-500', 'bg-indigo-50', 'bg-green-50', 'bg-purple-50');
+                card.classList.add('border-gray-300');
             });
 
-            // Test 3: Check database schema (if Supabase is configured)
-            if (typeof SUPABASE_CONFIG !== 'undefined') {
-                addTestResult('✅ Supabase configuration found', 'pass');
-            } else {
-                addTestResult('⚠️ Supabase configuration not found (will be loaded on signup page)', 'info');
+            // Add selected class to clicked card
+            element.classList.remove('border-gray-300');
+            if (type === 'individual') {
+                element.classList.add('border-indigo-500', 'bg-indigo-50');
+            } else if (type === 'peer') {
+                element.classList.add('border-green-500', 'bg-green-50');
+            } else if (type === 'professional') {
+                element.classList.add('border-purple-500', 'bg-purple-50');
             }
+
+            // Show/hide appropriate fields
+            const professionalFields = document.getElementById('professional-fields');
+            const licensedFields = document.getElementById('licensed-professional-fields');
+            const peerProfessionalFields = document.getElementById('peer-professional-fields');
+
+            if (type === 'professional') {
+                log('Showing professional fields');
+                professionalFields.classList.remove('hidden');
+                professionalFields.style.display = 'block';
+            } else {
+                log('Hiding professional fields');
+                professionalFields.classList.add('hidden');
+                professionalFields.style.display = 'none';
+                licensedFields.classList.add('hidden');
+                licensedFields.style.display = 'none';
+                peerProfessionalFields.classList.add('hidden');
+                peerProfessionalFields.style.display = 'none';
+            }
+
+            log('=== selectUserType completed ===');
         }
 
-        function addTestResult(message, type) {
-            const results = document.getElementById('test-results');
-            const div = document.createElement('div');
-            div.className = `test-result test-${type}`;
-            div.textContent = message;
-            results.appendChild(div);
+        function selectProfessionalType(type, element) {
+            log('=== selectProfessionalType called ===');
+            log('Professional Type: ' + type);
+            log('Element clicked: ' + element.className);
+
+            // Remove selected class from all professional type cards
+            document.querySelectorAll('.professional-type-card').forEach(card => {
+                card.classList.remove('border-purple-500', 'bg-purple-50');
+                card.classList.add('border-gray-300');
+            });
+
+            // Add selected class to clicked card
+            element.classList.remove('border-gray-300');
+            element.classList.add('border-purple-500', 'bg-purple-50');
+
+            // Check the radio button
+            const radio = element.querySelector('input[type="radio"]');
+            if (radio) {
+                radio.checked = true;
+                log('Radio button checked: ' + radio.value);
+            }
+
+            // Show/hide appropriate fields
+            const licensedFields = document.getElementById('licensed-professional-fields');
+            const peerProfessionalFields = document.getElementById('peer-professional-fields');
+
+            log('Licensed fields element: ' + (licensedFields ? 'found' : 'not found'));
+            log('Peer professional fields element: ' + (peerProfessionalFields ? 'found' : 'not found'));
+
+            if (type === 'licensed') {
+                log('Showing licensed fields');
+                licensedFields.classList.remove('hidden');
+                licensedFields.style.display = 'block';
+                peerProfessionalFields.classList.add('hidden');
+                peerProfessionalFields.style.display = 'none';
+            } else if (type === 'peer-professional') {
+                log('Showing peer professional fields');
+                peerProfessionalFields.classList.remove('hidden');
+                peerProfessionalFields.style.display = 'block';
+                licensedFields.classList.add('hidden');
+                licensedFields.style.display = 'none';
+            }
+
+            log('=== selectProfessionalType completed ===');
         }
 
-        // Run tests when page loads
-        document.addEventListener('DOMContentLoaded', runTests);
+        // Initialize
+        log('Test page loaded successfully');
+        log('Functions available: selectUserType=' + typeof selectUserType + ', selectProfessionalType=' + typeof selectProfessionalType);
     </script>
 </body>
 </html>
