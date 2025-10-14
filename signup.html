@@ -836,18 +836,12 @@
             
             if (type === 'peer') {
                 peerFields.classList.remove('hidden');
+                peerFields.style.display = 'block';
                 professionalFields.classList.add('hidden');
             } else if (type === 'professional') {
                 professionalFields.classList.remove('hidden');
+                professionalFields.style.display = 'block';
                 peerFields.classList.add('hidden');
-                
-                // Force show professional type selection cards
-                const professionalTypeCards = professionalFields.querySelector('.grid');
-                if (professionalTypeCards) {
-                    professionalTypeCards.style.display = 'grid';
-                    professionalTypeCards.classList.remove('hidden');
-                    console.log('Professional type cards should now be visible');
-                }
                 
                 console.log('Professional fields should now be visible');
             } else {
@@ -903,6 +897,7 @@
                 }
                 if (peerProfessionalFields) {
                     peerProfessionalFields.classList.add('hidden');
+                    peerProfessionalFields.style.display = 'none';
                     console.log('Hiding peer professional fields');
                 }
             } else if (type === 'peer-professional') {
@@ -913,6 +908,7 @@
                 }
                 if (licensedFields) {
                     licensedFields.classList.add('hidden');
+                    licensedFields.style.display = 'none';
                     console.log('Hiding licensed fields');
                 }
             }
