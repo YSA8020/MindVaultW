@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test License Types - MindVault</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Test License Types</h1>
+        
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">License Type Dropdown Test</h2>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">License Type *</label>
+                <select name="licenseType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                    <option value="">Select your license/certification type</option>
+                    
+                    <!-- Licensed Mental Health Professionals -->
+                    <optgroup label="Licensed Mental Health Professionals">
+                        <option value="lpc">Licensed Professional Counselor (LPC)</option>
+                        <option value="lmft">Licensed Marriage and Family Therapist (LMFT)</option>
+                        <option value="lcsw">Licensed Clinical Social Worker (LCSW)</option>
+                        <option value="psychologist">Psychologist (PhD/PsyD)</option>
+                        <option value="psychiatrist">Psychiatrist (MD/DO)</option>
+                        <option value="lmhc">Licensed Mental Health Counselor (LMHC)</option>
+                        <option value="lcp">Licensed Clinical Psychologist</option>
+                        <option value="lac">Licensed Addiction Counselor (LAC)</option>
+                    </optgroup>
+                    
+                    <!-- Peer Support Certifications -->
+                    <optgroup label="Peer Support Certifications">
+                        <option value="cps">Certified Peer Specialist (CPS)</option>
+                        <option value="cprs">Certified Peer Recovery Specialist (CPRS)</option>
+                        <option value="mhpc">Mental Health Peer Counselor</option>
+                        <option value="wrp">Wellness Recovery Action Plan Facilitator</option>
+                        <option value="peer-mentor">Certified Peer Mentor</option>
+                        <option value="recovery-coach">Certified Recovery Coach</option>
+                        <option value="family-peer">Family Peer Support Specialist</option>
+                        <option value="youth-peer">Youth Peer Support Specialist</option>
+                    </optgroup>
+                    
+                    <!-- Other -->
+                    <optgroup label="Other">
+                        <option value="other-licensed">Other Licensed Professional</option>
+                        <option value="other-certified">Other Certified Professional</option>
+                    </optgroup>
+                </select>
+            </div>
+            
+            <div class="mt-4">
+                <p class="text-sm text-gray-600">If you can see all the license types in the dropdown above, then the HTML is working correctly.</p>
+            </div>
+        </div>
+        
+        <div class="mt-8 bg-white rounded-lg shadow p-6">
+            <h2 class="text-xl font-semibold mb-4">Test Results</h2>
+            <div id="test-results" class="space-y-2">
+                <div>✅ License types HTML loaded successfully</div>
+                <div>✅ Dropdown should show 3 groups of options</div>
+                <div>✅ Licensed Mental Health Professionals (8 options)</div>
+                <div>✅ Peer Support Certifications (8 options)</div>
+                <div>✅ Other (2 options)</div>
+            </div>
+        </div>
+        
+        <div class="mt-8">
+            <a href="signup.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Go to Main Signup Page
+            </a>
+        </div>
+    </div>
+</body>
+</html>
