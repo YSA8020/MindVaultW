@@ -807,22 +807,33 @@
                 console.log(`Card ${index} onclick:`, card.onclick);
                 console.log(`Card ${index} getAttribute onclick:`, card.getAttribute('onclick'));
                 
+                // Determine the correct type based on the card's onclick attribute
+                let correctType = 'user'; // default
+                const onclickAttr = card.getAttribute('onclick');
+                if (onclickAttr) {
+                    if (onclickAttr.includes("'professional'")) {
+                        correctType = 'professional';
+                    } else if (onclickAttr.includes("'user'")) {
+                        correctType = 'user';
+                    }
+                }
+                
+                console.log(`Card ${index} correct type:`, correctType);
+                
                 // Add both onclick and addEventListener as backup
                 card.addEventListener('click', function(e) {
                     console.log('Card clicked via addEventListener:', this);
-                    // Call the original function
+                    // Call the original function with correct type
                     if (window.selectUserType) {
-                        const type = index === 0 ? 'user' : 'peer';
-                        window.selectUserType(type, this);
+                        window.selectUserType(correctType, this);
                     }
                 });
                 
-                // Also ensure onclick is set
-                const type = index === 0 ? 'user' : 'peer';
+                // Also ensure onclick is set with correct type
                 card.onclick = function() {
                     console.log('Card clicked via onclick:', this);
                     if (window.selectUserType) {
-                        window.selectUserType(type, this);
+                        window.selectUserType(correctType, this);
                     }
                 };
             });
