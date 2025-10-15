@@ -411,7 +411,7 @@
                                 
                             <!-- Licensed Counselor Fields -->
                             <div id="licensed-professional-fields" class="border-t pt-6">
-                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Licensed Professional Information</h3>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Professional Information</h3>
                                 
                                 <div class="space-y-4">
                                 <div>
@@ -771,6 +771,29 @@
             
             // Debug logging for user type cards
             console.log('User type cards found:', userTypeCards.length);
+            
+            // Add test button for debugging professional fields
+            const testButton = document.createElement('button');
+            testButton.textContent = 'TEST: Show Professional Fields';
+            testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: blue; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;';
+            testButton.onclick = function() {
+                console.log('Test button clicked - showing professional fields');
+                const professionalFields = document.getElementById('professional-fields');
+                const licensedFields = document.getElementById('licensed-professional-fields');
+                
+                if (professionalFields) {
+                    professionalFields.classList.remove('hidden');
+                    professionalFields.style.display = 'block';
+                    console.log('Professional fields shown');
+                }
+                
+                if (licensedFields) {
+                    licensedFields.style.display = 'block';
+                    licensedFields.style.visibility = 'visible';
+                    console.log('Licensed fields shown');
+                }
+            };
+            document.body.appendChild(testButton);
             
             userTypeCards.forEach((card, index) => {
                 console.log(`Card ${index}:`, card);
