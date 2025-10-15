@@ -146,7 +146,6 @@
                         <select id="type-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
                             <option value="">All Types</option>
                             <option value="licensed">Licensed Counselor</option>
-                            <option value="peer-professional">Peer Support Professional</option>
                         </select>
                     </div>
                     <div>
@@ -256,8 +255,7 @@
                 const { data, error } = await window.supabaseClient
                     .from('users')
                     .select('*')
-                    .eq('professional_type', 'licensed')
-                    .or('professional_type.eq.peer-professional');
+                    .eq('professional_type', 'licensed');
 
                 if (error) {
                     console.error('Error loading applications:', error);
@@ -315,7 +313,7 @@
                                 </div>
                                 <div class="text-sm text-gray-500">${app.email}</div>
                                 <div class="text-sm text-gray-500">
-                                    ${app.professional_type === 'licensed' ? 'Licensed Counselor' : 'Peer Support Professional'}
+                                    Licensed Counselor
                                 </div>
                             </div>
                         </div>
@@ -398,7 +396,7 @@
                     <div>
                         <h4 class="font-medium text-gray-900 mb-3">Professional Information</h4>
                         <div class="space-y-2 text-sm">
-                            <div><span class="font-medium">Type:</span> ${application.professional_type === 'licensed' ? 'Licensed Counselor' : 'Peer Support Professional'}</div>
+                            <div><span class="font-medium">Type:</span> Licensed Counselor</div>
                             ${application.license_type ? `<div><span class="font-medium">License Type:</span> ${application.license_type}</div>` : ''}
                             ${application.license_number ? `<div><span class="font-medium">License Number:</span> ${application.license_number}</div>` : ''}
                             ${application.years_experience ? `<div><span class="font-medium">Experience:</span> ${application.years_experience}</div>` : ''}
