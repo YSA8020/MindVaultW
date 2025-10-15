@@ -290,7 +290,7 @@
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Regular User -->
-                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="console.log('User card clicked!'); selectUserType('user', this);">
+                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="selectUserType('user', this);">
                         <div class="text-center">
                             <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg class="h-8 w-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -327,7 +327,7 @@
 
 
                     <!-- Professional / Counselor -->
-                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="console.log('Professional card clicked!'); selectUserType('professional', this);">
+                    <div class="user-type-card bg-white p-8 rounded-2xl border-2 border-gray-200 shadow-lg" onclick="selectUserType('professional', this);">
                         <div class="text-center">
                             <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -689,15 +689,7 @@
 
         // Global function for user type selection
         window.selectUserType = function(type, element) {
-            console.log('=== selectUserType called ===');
-            console.log('Type received:', type);
-            console.log('Element:', element);
-            console.log('Element text content:', element.textContent);
-            
             selectedUserType = type;
-            
-            console.log('User type selected:', type);
-            console.log('Will show professional fields?', type === 'professional');
             
             // Remove selected class from all cards
             document.querySelectorAll('.user-type-card').forEach(card => {
@@ -727,12 +719,8 @@
             
             // Show/hide professional fields
             const professionalFields = document.getElementById('professional-fields');
-            console.log('Professional fields element:', professionalFields);
-            console.log('Type check - type === "professional":', type === 'professional');
-            console.log('Type value:', JSON.stringify(type));
             
             if (type === 'professional') {
-                console.log('Showing professional fields');
                 professionalFields.classList.remove('hidden');
                 professionalFields.style.display = 'block';
                 
@@ -743,7 +731,6 @@
                     licensedFields.style.visibility = 'visible';
                 }
             } else {
-                console.log('Hiding professional fields for type:', type);
                 professionalFields.classList.add('hidden');
             }
             
@@ -779,41 +766,10 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, selectUserType available:', typeof window.selectUserType);
             
-            // Test clicking on user type cards
+            // Set up user type cards
             const userTypeCards = document.querySelectorAll('.user-type-card');
-            console.log('Found user type cards:', userTypeCards.length);
-            
-            // Debug logging for user type cards
-            console.log('User type cards found:', userTypeCards.length);
-            
-            // Add test button for debugging professional fields
-            const testButton = document.createElement('button');
-            testButton.textContent = 'TEST: Show Professional Fields';
-            testButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: blue; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;';
-            testButton.onclick = function() {
-                console.log('Test button clicked - showing professional fields');
-                const professionalFields = document.getElementById('professional-fields');
-                const licensedFields = document.getElementById('licensed-professional-fields');
-                
-                if (professionalFields) {
-                    professionalFields.classList.remove('hidden');
-                    professionalFields.style.display = 'block';
-                    console.log('Professional fields shown');
-                }
-                
-                if (licensedFields) {
-                    licensedFields.style.display = 'block';
-                    licensedFields.style.visibility = 'visible';
-                    console.log('Licensed fields shown');
-                }
-            };
-            document.body.appendChild(testButton);
             
             userTypeCards.forEach((card, index) => {
-                console.log(`Card ${index}:`, card);
-                console.log(`Card ${index} onclick:`, card.onclick);
-                console.log(`Card ${index} getAttribute onclick:`, card.getAttribute('onclick'));
-                
                 // Determine the correct type based on the card's onclick attribute
                 let correctType = 'user'; // default
                 const onclickAttr = card.getAttribute('onclick');
@@ -825,11 +781,8 @@
                     }
                 }
                 
-                console.log(`Card ${index} correct type:`, correctType);
-                
                 // Add both onclick and addEventListener as backup
                 card.addEventListener('click', function(e) {
-                    console.log('Card clicked via addEventListener:', this);
                     // Call the original function with correct type
                     if (window.selectUserType) {
                         window.selectUserType(correctType, this);
@@ -838,7 +791,6 @@
                 
                 // Also ensure onclick is set with correct type
                 card.onclick = function() {
-                    console.log('Card clicked via onclick:', this);
                     if (window.selectUserType) {
                         window.selectUserType(correctType, this);
                     }
