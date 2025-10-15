@@ -690,12 +690,14 @@
         // Global function for user type selection
         window.selectUserType = function(type, element) {
             console.log('=== selectUserType called ===');
-            console.log('Type:', type);
+            console.log('Type received:', type);
             console.log('Element:', element);
+            console.log('Element text content:', element.textContent);
             
             selectedUserType = type;
             
             console.log('User type selected:', type);
+            console.log('Will show professional fields?', type === 'professional');
             
             // Remove selected class from all cards
             document.querySelectorAll('.user-type-card').forEach(card => {
@@ -725,8 +727,12 @@
             
             // Show/hide professional fields
             const professionalFields = document.getElementById('professional-fields');
+            console.log('Professional fields element:', professionalFields);
+            console.log('Type check - type === "professional":', type === 'professional');
+            console.log('Type value:', JSON.stringify(type));
             
             if (type === 'professional') {
+                console.log('Showing professional fields');
                 professionalFields.classList.remove('hidden');
                 professionalFields.style.display = 'block';
                 
@@ -737,6 +743,7 @@
                     licensedFields.style.visibility = 'visible';
                 }
             } else {
+                console.log('Hiding professional fields for type:', type);
                 professionalFields.classList.add('hidden');
             }
             
