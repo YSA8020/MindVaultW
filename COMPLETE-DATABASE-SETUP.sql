@@ -9,29 +9,35 @@
 -- CLEANUP: Drop existing functions and views (if any)
 -- ============================================================================
 
--- Drop existing functions
-DROP FUNCTION IF EXISTS cleanup_old_error_logs() CASCADE;
-DROP FUNCTION IF EXISTS cleanup_old_activity_logs() CASCADE;
-DROP FUNCTION IF EXISTS cleanup_old_rate_limits() CASCADE;
-DROP FUNCTION IF EXISTS cleanup_old_failed_logins() CASCADE;
-DROP FUNCTION IF EXISTS cleanup_old_security_events() CASCADE;
-DROP FUNCTION IF EXISTS check_rate_limit(UUID, TEXT, TEXT, INTEGER, INTEGER) CASCADE;
-DROP FUNCTION IF EXISTS check_rate_limit(TEXT, TEXT, TEXT, INTEGER, INTEGER) CASCADE;
-DROP FUNCTION IF EXISTS log_failed_login(TEXT, TEXT, TEXT, TEXT) CASCADE;
-DROP FUNCTION IF EXISTS log_security_event(UUID, TEXT, TEXT, TEXT, BOOLEAN, TEXT, JSONB) CASCADE;
-DROP FUNCTION IF EXISTS log_security_event(TEXT, TEXT, TEXT, TEXT, BOOLEAN, TEXT, JSONB) CASCADE;
-DROP FUNCTION IF EXISTS initialize_professional_onboarding(UUID) CASCADE;
-DROP FUNCTION IF EXISTS initialize_professional_onboarding(TEXT) CASCADE;
-DROP FUNCTION IF EXISTS update_onboarding_progress(UUID, TEXT) CASCADE;
-DROP FUNCTION IF EXISTS update_onboarding_progress(TEXT, TEXT) CASCADE;
-DROP FUNCTION IF EXISTS get_onboarding_status(UUID) CASCADE;
-DROP FUNCTION IF EXISTS get_onboarding_status(TEXT) CASCADE;
-DROP FUNCTION IF EXISTS get_professional_dashboard_stats(UUID) CASCADE;
-DROP FUNCTION IF EXISTS get_professional_dashboard_stats(TEXT) CASCADE;
-DROP FUNCTION IF EXISTS get_upcoming_sessions(UUID, INTEGER) CASCADE;
-DROP FUNCTION IF EXISTS get_upcoming_sessions(TEXT, INTEGER) CASCADE;
-DROP FUNCTION IF EXISTS get_professional_clients(UUID, TEXT) CASCADE;
-DROP FUNCTION IF EXISTS get_professional_clients(TEXT, TEXT) CASCADE;
+-- Drop existing functions (using CASCADE to handle all dependencies)
+DO $$ 
+DECLARE
+    r RECORD;
+BEGIN
+    -- Drop all functions that might exist
+    FOR r IN (SELECT proname, oidvectortypes(proargtypes) as args 
+              FROM pg_proc 
+              WHERE proname IN (
+                  'cleanup_old_error_logs',
+                  'cleanup_old_activity_logs',
+                  'cleanup_old_rate_limits',
+                  'cleanup_old_failed_logins',
+                  'cleanup_old_security_events',
+                  'check_rate_limit',
+                  'log_failed_login',
+                  'log_security_event',
+                  'initialize_professional_onboarding',
+                  'update_onboarding_progress',
+                  'get_onboarding_status',
+                  'get_professional_dashboard_stats',
+                  'get_upcoming_sessions',
+                  'get_professional_clients'
+              )
+              AND pronamespace = (SELECT oid FROM pg_namespace WHERE nspname = 'public'))
+    LOOP
+        EXECUTE 'DROP FUNCTION IF EXISTS ' || quote_ident(r.proname) || '(' || r.args || ') CASCADE';
+    END LOOP;
+END $$;
 
 -- Drop existing views
 DROP VIEW IF EXISTS error_stats CASCADE;
