@@ -36,7 +36,7 @@ DROP VIEW IF EXISTS user_journey CASCADE;
 
 -- Users table (if not already created)
 CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email TEXT NOT NULL UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
@@ -85,13 +85,13 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users
 CREATE POLICY "Users can view own profile" ON users
-    FOR SELECT USING (auth.uid() = id::uuid);
+    FOR SELECT USING (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile" ON users
-    FOR UPDATE USING (auth.uid() = id::uuid);
+    FOR UPDATE USING (auth.uid() = id);
 
 CREATE POLICY "Users can insert own profile" ON users
-    FOR INSERT WITH CHECK (auth.uid() = id::uuid);
+    FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- ============================================================================
 -- PART 2: Error Logging System
@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS error_logs (
     severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
     stack_trace TEXT,
     context JSONB,
-    user_id TEXT,
+    user_id UUID,
     session_id TEXT,
     url TEXT,
     user_agent TEXT,
@@ -128,7 +128,7 @@ CREATE POLICY "Admins can view all error logs" ON error_logs
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id::uuid = auth.uid() 
+            WHERE users.id = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -166,7 +166,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS user_activity_logs (
     activity_id BIGSERIAL PRIMARY KEY,
-    user_id TEXT,
+    user_id UUID,
     session_id TEXT,
     event_type TEXT NOT NULL,
     event_details JSONB,
@@ -184,7 +184,7 @@ CREATE INDEX IF NOT EXISTS idx_user_activity_logs_timestamp ON user_activity_log
 ALTER TABLE user_activity_logs ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view own activity" ON user_activity_logs
-    FOR SELECT USING (auth.uid() = user_id::uuid);
+    FOR SELECT USING (auth.uid() = user_id);
 
 -- Activity stats view
 CREATE OR REPLACE VIEW user_activity_stats AS
@@ -232,7 +232,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS rate_limits (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT,
+    user_id UUID,
     ip_address TEXT,
     endpoint TEXT NOT NULL,
     request_count INTEGER DEFAULT 1,
@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS rate_limits (
 
 CREATE TABLE IF NOT EXISTS failed_login_attempts (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT,
+    user_id UUID,
     email TEXT,
     ip_address TEXT NOT NULL,
     user_agent TEXT,
@@ -259,7 +259,7 @@ CREATE TABLE IF NOT EXISTS failed_login_attempts (
 
 CREATE TABLE IF NOT EXISTS suspicious_activity (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT,
+    user_id UUID,
     ip_address TEXT,
     activity_type TEXT NOT NULL CHECK (activity_type IN ('multiple_failed_logins', 'rapid_requests', 'unusual_pattern', 'potential_abuse', 'security_threat')),
     description TEXT NOT NULL,
@@ -287,7 +287,7 @@ CREATE TABLE IF NOT EXISTS ip_blacklist (
 
 CREATE TABLE IF NOT EXISTS user_security_settings (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL UNIQUE,
+    user_id UUID NOT NULL UNIQUE,
     max_login_attempts INTEGER DEFAULT 5,
     lockout_duration_minutes INTEGER DEFAULT 15,
     require_two_factor BOOLEAN DEFAULT FALSE,
@@ -311,7 +311,7 @@ CREATE TABLE IF NOT EXISTS user_security_settings (
 
 CREATE TABLE IF NOT EXISTS security_events (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT,
+    user_id UUID,
     event_type TEXT NOT NULL CHECK (event_type IN ('login', 'logout', 'password_change', 'email_change', 'two_factor_enabled', 'two_factor_disabled', 'suspicious_activity', 'account_locked', 'account_unlocked')),
     ip_address TEXT,
     user_agent TEXT,
@@ -346,19 +346,19 @@ ALTER TABLE security_events ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 CREATE POLICY "Users can view own security settings" ON user_security_settings
-    FOR SELECT USING (auth.uid() = user_id::uuid);
+    FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own security settings" ON user_security_settings
-    FOR UPDATE USING (auth.uid() = user_id::uuid);
+    FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can view own security events" ON security_events
-    FOR SELECT USING (auth.uid() = user_id::uuid);
+    FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Admins can view all security data" ON rate_limits
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id::uuid = auth.uid() 
+            WHERE users.id = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -367,7 +367,7 @@ CREATE POLICY "Admins can view all failed login attempts" ON failed_login_attemp
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id::uuid = auth.uid() 
+            WHERE users.id = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -376,7 +376,7 @@ CREATE POLICY "Admins can view all suspicious activity" ON suspicious_activity
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id::uuid = auth.uid() 
+            WHERE users.id = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -385,7 +385,7 @@ CREATE POLICY "Admins can manage IP blacklist" ON ip_blacklist
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id::uuid = auth.uid() 
+            WHERE users.id = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -394,7 +394,7 @@ CREATE POLICY "Admins can view all security events" ON security_events
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id::uuid = auth.uid() 
+            WHERE users.id = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -564,7 +564,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TABLE IF NOT EXISTS onboarding_progress (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL UNIQUE,
+    user_id UUID NOT NULL UNIQUE,
     stage_completed TEXT CHECK (stage_completed IN ('welcome', 'profile', 'credentials', 'availability', 'preferences', 'completed')),
     current_stage TEXT CHECK (current_stage IN ('welcome', 'profile', 'credentials', 'availability', 'preferences', 'completed')),
     welcome_completed BOOLEAN DEFAULT FALSE,
@@ -583,7 +583,7 @@ CREATE TABLE IF NOT EXISTS onboarding_progress (
 
 CREATE TABLE IF NOT EXISTS professional_profiles (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL UNIQUE,
+    user_id UUID NOT NULL UNIQUE,
     license_type TEXT,
     license_number TEXT,
     license_state TEXT,
@@ -620,7 +620,7 @@ CREATE TABLE IF NOT EXISTS professional_profiles (
 
 CREATE TABLE IF NOT EXISTS onboarding_checkpoints (
     id BIGSERIAL PRIMARY KEY,
-    user_id TEXT NOT NULL,
+    user_id UUID NOT NULL,
     checkpoint_name TEXT NOT NULL,
     checkpoint_type TEXT CHECK (checkpoint_type IN ('info', 'action', 'verification', 'test')),
     stage TEXT NOT NULL,
@@ -659,25 +659,25 @@ ALTER TABLE onboarding_resources ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 CREATE POLICY "Users can view own onboarding progress" ON onboarding_progress
-    FOR SELECT USING (auth.uid() = user_id::uuid);
+    FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own onboarding progress" ON onboarding_progress
-    FOR UPDATE USING (auth.uid() = user_id::uuid);
+    FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert own onboarding progress" ON onboarding_progress
-    FOR INSERT WITH CHECK (auth.uid() = user_id::uuid);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can view own professional profile" ON professional_profiles
-    FOR SELECT USING (auth.uid() = user_id::uuid);
+    FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can update own professional profile" ON professional_profiles
-    FOR UPDATE USING (auth.uid() = user_id::uuid);
+    FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can insert own professional profile" ON professional_profiles
-    FOR INSERT WITH CHECK (auth.uid() = user_id::uuid);
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 CREATE POLICY "Users can view own onboarding checkpoints" ON onboarding_checkpoints
-    FOR ALL USING (auth.uid() = user_id::uuid);
+    FOR ALL USING (auth.uid() = user_id);
 
 CREATE POLICY "Public can view onboarding resources" ON onboarding_resources
     FOR SELECT USING (true);
@@ -829,8 +829,8 @@ ON CONFLICT DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS client_professional_relationships (
     id BIGSERIAL PRIMARY KEY,
-    client_id TEXT NOT NULL,
-    professional_id TEXT NOT NULL,
+    client_id UUID NOT NULL,
+    professional_id UUID NOT NULL,
     relationship_status TEXT CHECK (relationship_status IN ('pending', 'active', 'paused', 'ended')) DEFAULT 'pending',
     match_score DECIMAL(5, 2),
     matched_on DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -854,8 +854,8 @@ CREATE TABLE IF NOT EXISTS client_professional_relationships (
 
 CREATE TABLE IF NOT EXISTS sessions (
     id BIGSERIAL PRIMARY KEY,
-    client_id TEXT NOT NULL,
-    professional_id TEXT NOT NULL,
+    client_id UUID NOT NULL,
+    professional_id UUID NOT NULL,
     session_date DATE NOT NULL,
     session_time TIME NOT NULL,
     session_duration_minutes INTEGER DEFAULT 60,
@@ -885,8 +885,8 @@ CREATE TABLE IF NOT EXISTS sessions (
 
 CREATE TABLE IF NOT EXISTS treatment_plans (
     id BIGSERIAL PRIMARY KEY,
-    client_id TEXT NOT NULL,
-    professional_id TEXT NOT NULL,
+    client_id UUID NOT NULL,
+    professional_id UUID NOT NULL,
     plan_name TEXT NOT NULL,
     plan_description TEXT,
     diagnosis TEXT,
@@ -911,8 +911,8 @@ CREATE TABLE IF NOT EXISTS treatment_plans (
 
 CREATE TABLE IF NOT EXISTS client_assessments (
     id BIGSERIAL PRIMARY KEY,
-    client_id TEXT NOT NULL,
-    professional_id TEXT NOT NULL,
+    client_id UUID NOT NULL,
+    professional_id UUID NOT NULL,
     assessment_type TEXT NOT NULL CHECK (assessment_type IN ('initial', 'progress', 'outcome', 'custom')),
     assessment_name TEXT NOT NULL,
     assessment_date DATE NOT NULL,
@@ -929,8 +929,8 @@ CREATE TABLE IF NOT EXISTS client_assessments (
 
 CREATE TABLE IF NOT EXISTS client_notes (
     id BIGSERIAL PRIMARY KEY,
-    client_id TEXT NOT NULL,
-    professional_id TEXT NOT NULL,
+    client_id UUID NOT NULL,
+    professional_id UUID NOT NULL,
     session_id BIGINT,
     note_type TEXT CHECK (note_type IN ('session', 'phone', 'email', 'general', 'emergency')) DEFAULT 'general',
     note_date DATE NOT NULL,
@@ -951,7 +951,7 @@ CREATE TABLE IF NOT EXISTS client_notes (
 
 CREATE TABLE IF NOT EXISTS professional_availability (
     id BIGSERIAL PRIMARY KEY,
-    professional_id TEXT NOT NULL UNIQUE,
+    professional_id UUID NOT NULL UNIQUE,
     available_for_new_clients BOOLEAN DEFAULT TRUE,
     max_clients INTEGER DEFAULT 20,
     current_client_count INTEGER DEFAULT 0,
@@ -969,7 +969,7 @@ CREATE TABLE IF NOT EXISTS professional_availability (
 
 CREATE TABLE IF NOT EXISTS professional_analytics (
     id BIGSERIAL PRIMARY KEY,
-    professional_id TEXT NOT NULL,
+    professional_id UUID NOT NULL,
     analytics_date DATE NOT NULL,
     total_clients INTEGER DEFAULT 0,
     active_clients INTEGER DEFAULT 0,
@@ -1011,40 +1011,40 @@ ALTER TABLE professional_analytics ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 CREATE POLICY "Professionals can view own client relationships" ON client_professional_relationships
-    FOR SELECT USING (auth.uid() = professional_id::uuid);
+    FOR SELECT USING (auth.uid() = professional_id);
 
 CREATE POLICY "Professionals can manage own client relationships" ON client_professional_relationships
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 CREATE POLICY "Clients can view own relationships" ON client_professional_relationships
-    FOR SELECT USING (auth.uid() = client_id::uuid);
+    FOR SELECT USING (auth.uid() = client_id);
 
 CREATE POLICY "Professionals can view own sessions" ON sessions
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 CREATE POLICY "Clients can view own sessions" ON sessions
-    FOR SELECT USING (auth.uid() = client_id::uuid);
+    FOR SELECT USING (auth.uid() = client_id);
 
 CREATE POLICY "Professionals can view own treatment plans" ON treatment_plans
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 CREATE POLICY "Clients can view own treatment plans" ON treatment_plans
-    FOR SELECT USING (auth.uid() = client_id::uuid);
+    FOR SELECT USING (auth.uid() = client_id);
 
 CREATE POLICY "Professionals can view own assessments" ON client_assessments
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 CREATE POLICY "Clients can view own assessments" ON client_assessments
-    FOR SELECT USING (auth.uid() = client_id::uuid);
+    FOR SELECT USING (auth.uid() = client_id);
 
 CREATE POLICY "Professionals can view own notes" ON client_notes
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 CREATE POLICY "Professionals can manage own availability" ON professional_availability
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 CREATE POLICY "Professionals can view own analytics" ON professional_analytics
-    FOR ALL USING (auth.uid() = professional_id::uuid);
+    FOR ALL USING (auth.uid() = professional_id);
 
 -- Professional dashboard functions
 CREATE OR REPLACE FUNCTION get_professional_dashboard_stats(p_professional_id TEXT)
