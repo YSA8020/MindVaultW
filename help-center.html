@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Help Center - MindVault</title>
+    <meta name="description" content="Get help with MindVault - Your mental fitness companion">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .faq-item {
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .search-highlight {
+            background-color: #fef3c7;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-purple-600">MindVault.fit</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index-backup.html" class="text-gray-600 hover:text-gray-900">Back to Site</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Help Center</h1>
+            <p class="text-xl text-gray-600">Find answers to common questions and get the most out of MindVault</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-2xl mx-auto mb-12">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    id="search-input"
+                    placeholder="Search for help..." 
+                    class="w-full px-6 py-4 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg"
+                >
+                <svg class="absolute left-4 top-4 w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+            <div id="search-results" class="mt-4 hidden"></div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <a href="#getting-started" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Getting Started</h3>
+                </div>
+                <p class="text-gray-600">New to MindVault? Start here</p>
+            </a>
+
+            <a href="#account-settings" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Account Settings</h3>
+                </div>
+                <p class="text-gray-600">Manage your profile and preferences</p>
+            </a>
+
+            <a href="#troubleshooting" class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900">Troubleshooting</h3>
+                </div>
+                <p class="text-gray-600">Common issues and solutions</p>
+            </a>
+        </div>
+
+        <!-- Getting Started Section -->
+        <section id="getting-started" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Getting Started</h2>
+            <div class="space-y-4">
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I create an account?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>Creating an account is easy:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Click "Sign Up" on the homepage</li>
+                            <li>Choose your account type (User or Professional)</li>
+                            <li>Fill in your email, password, and basic information</li>
+                            <li>Verify your email address</li>
+                            <li>Complete your profile</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">What's the difference between User and Professional accounts?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p><strong>User Accounts:</strong> For individuals seeking mental health support. Features include mood tracking, peer support, and access to professional counselors.</p>
+                        <p class="mt-2"><strong>Professional Accounts:</strong> For licensed mental health professionals and certified peer support specialists. Features include client management, scheduling, and professional resources.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I track my mood?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>Mood tracking is simple:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Go to your Dashboard</li>
+                            <li>Click "Track Mood" or the mood tracking card</li>
+                            <li>Select your current mood (1-10 scale)</li>
+                            <li>Add optional notes about how you're feeling</li>
+                            <li>Submit your entry</li>
+                        </ol>
+                        <p class="mt-2">You can track your mood multiple times per day to see patterns and trends.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I connect with a counselor?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>To connect with a counselor:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Navigate to "Find a Counselor" from your dashboard</li>
+                            <li>Browse available professionals or use filters</li>
+                            <li>View counselor profiles and specializations</li>
+                            <li>Send a connection request</li>
+                            <li>Schedule your first session</li>
+                        </ol>
+                        <p class="mt-2">All counselors are verified, licensed professionals.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Account Settings Section -->
+        <section id="account-settings" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Account Settings</h2>
+            <div class="space-y-4">
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I change my password?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>To change your password:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Go to Settings → Security</li>
+                            <li>Click "Change Password"</li>
+                            <li>Enter your current password</li>
+                            <li>Enter your new password (minimum 8 characters)</li>
+                            <li>Confirm your new password</li>
+                            <li>Click "Update Password"</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I update my profile information?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>To update your profile:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Go to Settings → Profile</li>
+                            <li>Click "Edit Profile"</li>
+                            <li>Update any information you'd like to change</li>
+                            <li>Click "Save Changes"</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I delete my account?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>To delete your account:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Go to Settings → Account</li>
+                            <li>Scroll to "Delete Account"</li>
+                            <li>Click "Delete My Account"</li>
+                            <li>Confirm your decision</li>
+                            <li>Enter your password to confirm</li>
+                        </ol>
+                        <p class="mt-2 text-red-600"><strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Troubleshooting Section -->
+        <section id="troubleshooting" class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-6">Troubleshooting</h2>
+            <div class="space-y-4">
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">I forgot my password. How do I reset it?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>To reset your password:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Go to the login page</li>
+                            <li>Click "Forgot Password?"</li>
+                            <li>Enter your email address</li>
+                            <li>Check your email for a password reset link</li>
+                            <li>Click the link and create a new password</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">The page is not loading. What should I do?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>Try these troubleshooting steps:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Refresh the page (Ctrl+F5 or Cmd+Shift+R)</li>
+                            <li>Clear your browser cache</li>
+                            <li>Try a different browser</li>
+                            <li>Disable browser extensions temporarily</li>
+                            <li>Check your internet connection</li>
+                            <li>Contact support if the issue persists</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">I'm not receiving email notifications. What's wrong?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>If you're not receiving emails:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Check your spam/junk folder</li>
+                            <li>Verify your email address in Settings</li>
+                            <li>Check your email notification preferences</li>
+                            <li>Make sure noreply@mindvault.fit is whitelisted</li>
+                            <li>Contact support if the issue continues</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="faq-item bg-white p-6 rounded-lg shadow cursor-pointer" onclick="toggleFaq(this)">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How do I report a bug or issue?</h3>
+                        <svg class="w-6 h-6 text-gray-400 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden mt-4 text-gray-600">
+                        <p>To report a bug or issue:</p>
+                        <ol class="list-decimal list-inside mt-2 space-y-2">
+                            <li>Go to Settings → Help & Support</li>
+                            <li>Click "Report an Issue"</li>
+                            <li>Describe the problem in detail</li>
+                            <li>Include screenshots if possible</li>
+                            <li>Submit your report</li>
+                        </ol>
+                        <p class="mt-2">You can also email us at support@mindvault.fit</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Support -->
+        <section class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-8 text-white text-center">
+            <h2 class="text-3xl font-bold mb-4">Still Need Help?</h2>
+            <p class="text-xl mb-6">Our support team is here to assist you</p>
+            <div class="flex justify-center space-x-4">
+                <a href="mailto:support@mindvault.fit" class="bg-white text-purple-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-colors font-semibold">
+                    Email Support
+                </a>
+                <a href="index-backup.html" class="bg-purple-700 text-white px-6 py-3 rounded-lg hover:bg-purple-800 transition-colors font-semibold">
+                    Live Chat
+                </a>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function toggleFaq(element) {
+            const answer = element.querySelector('.faq-answer');
+            const icon = element.querySelector('svg');
+            
+            if (answer.classList.contains('hidden')) {
+                answer.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                answer.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const resultsDiv = document.getElementById('search-results');
+            
+            if (searchTerm.length < 2) {
+                resultsDiv.classList.add('hidden');
+                return;
+            }
+            
+            const faqItems = document.querySelectorAll('.faq-item');
+            let results = [];
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('h3').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+                
+                if (question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    results.push({
+                        question: item.querySelector('h3').textContent,
+                        element: item
+                    });
+                }
+            });
+            
+            if (results.length > 0) {
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.innerHTML = `
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h3 class="font-semibold text-gray-900 mb-2">Found ${results.length} result(s):</h3>
+                        <div class="space-y-2">
+                            ${results.map(result => `
+                                <a href="#" onclick="event.preventDefault(); scrollToFaq('${result.element.id}'); return false;" class="block text-blue-600 hover:text-blue-800">
+                                    ${result.question}
+                                </a>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsDiv.classList.add('hidden');
+            }
+        });
+
+        function scrollToFaq(element) {
+            document.getElementById('search-input').value = '';
+            document.getElementById('search-results').classList.add('hidden');
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.click();
+        }
+    </script>
+</body>
+</html>
