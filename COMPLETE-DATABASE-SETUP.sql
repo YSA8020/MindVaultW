@@ -36,17 +36,23 @@ DROP VIEW IF EXISTS error_stats CASCADE;
 DROP VIEW IF EXISTS user_activity_stats CASCADE;
 DROP VIEW IF EXISTS user_journey CASCADE;
 
--- Drop existing policies
+-- Drop existing policies (simplified to avoid any UUID/TEXT issues)
+-- Note: This will drop all policies on all tables - we'll recreate them below
 DO $$ 
 DECLARE
     r RECORD;
 BEGIN
-    FOR r IN (SELECT schemaname, tablename, policyname
+    -- Drop policies from pg_policies view
+    FOR r IN (SELECT tablename, policyname
               FROM pg_policies
               WHERE schemaname = 'public')
     LOOP
-        EXECUTE 'DROP POLICY IF EXISTS ' || quote_ident(r.policyname) || 
-                ' ON ' || quote_ident(r.schemaname) || '.' || quote_ident(r.tablename);
+        BEGIN
+            EXECUTE format('DROP POLICY IF EXISTS %I ON %I', r.policyname, r.tablename);
+        EXCEPTION WHEN OTHERS THEN
+            -- Ignore errors and continue
+            NULL;
+        END;
     END LOOP;
 END $$;
 
