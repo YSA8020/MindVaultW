@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNS Test - MindVault.fit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="max-w-4xl mx-auto p-8">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-6">DNS Configuration Test</h1>
+            
+            <div class="space-y-6">
+                <!-- Current Domain Info -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-blue-900 mb-2">Current Domain Information</h2>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Domain:</strong> <span id="current-domain"></span></p>
+                        <p><strong>Protocol:</strong> <span id="current-protocol"></span></p>
+                        <p><strong>Host:</strong> <span id="current-host"></span></p>
+                        <p><strong>Port:</strong> <span id="current-port"></span></p>
+                    </div>
+                </div>
+
+                <!-- Expected GitHub Pages Configuration -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-green-900 mb-2">Expected GitHub Pages Configuration</h2>
+                    <div class="space-y-2 text-sm">
+                        <p><strong>Custom Domain:</strong> mindvault.fit</p>
+                        <p><strong>GitHub Pages URL:</strong> ysa8020.github.io/MindVaultW</p>
+                        <p><strong>Repository:</strong> YSA8020/MindVaultW</p>
+                    </div>
+                </div>
+
+                <!-- DNS Records -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-yellow-900 mb-2">Required DNS Records (GoDaddy)</h2>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-yellow-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left">Type</th>
+                                    <th class="px-4 py-2 text-left">Name</th>
+                                    <th class="px-4 py-2 text-left">Value</th>
+                                    <th class="px-4 py-2 text-left">TTL</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-yellow-200">
+                                <tr>
+                                    <td class="px-4 py-2">A</td>
+                                    <td class="px-4 py-2">@</td>
+                                    <td class="px-4 py-2">185.199.108.153</td>
+                                    <td class="px-4 py-2">600s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2">A</td>
+                                    <td class="px-4 py-2">@</td>
+                                    <td class="px-4 py-2">185.199.109.153</td>
+                                    <td class="px-4 py-2">600s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2">A</td>
+                                    <td class="px-4 py-2">@</td>
+                                    <td class="px-4 py-2">185.199.110.153</td>
+                                    <td class="px-4 py-2">600s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2">A</td>
+                                    <td class="px-4 py-2">@</td>
+                                    <td class="px-4 py-2">185.199.111.153</td>
+                                    <td class="px-4 py-2">600s</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2">CNAME</td>
+                                    <td class="px-4 py-2">www</td>
+                                    <td class="px-4 py-2">ysa8020.github.io</td>
+                                    <td class="px-4 py-2">600s</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Test Results -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-gray-900 mb-2">DNS Test Results</h2>
+                    <div id="test-results" class="space-y-2 text-sm">
+                        <p class="text-gray-600">Click "Run DNS Test" to check your configuration</p>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex space-x-4">
+                    <button onclick="runDNSTest()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                        Run DNS Test
+                    </button>
+                    <button onclick="window.location.href='DNS-VERIFICATION-CHECKLIST.md'" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                        View Full Checklist
+                    </button>
+                    <button onclick="window.location.href='index.html'" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors">
+                        Go to Main Site
+                    </button>
+                </div>
+
+                <!-- Status Messages -->
+                <div id="status-messages" class="space-y-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Display current domain information
+        document.getElementById('current-domain').textContent = window.location.hostname;
+        document.getElementById('current-protocol').textContent = window.location.protocol;
+        document.getElementById('current-host').textContent = window.location.host;
+        document.getElementById('current-port').textContent = window.location.port || 'default (80/443)';
+
+        async function runDNSTest() {
+            const resultsDiv = document.getElementById('test-results');
+            const statusDiv = document.getElementById('status-messages');
+            
+            resultsDiv.innerHTML = '<p class="text-blue-600">Running DNS tests...</p>';
+            statusDiv.innerHTML = '';
+
+            try {
+                // Test 1: Check if we're on the correct domain
+                const currentDomain = window.location.hostname;
+                const isCorrectDomain = currentDomain === 'mindvault.fit' || currentDomain === 'www.mindvault.fit';
+                
+                resultsDiv.innerHTML = `
+                    <div class="space-y-3">
+                        <div class="flex items-center ${isCorrectDomain ? 'text-green-600' : 'text-red-600'}">
+                            <span class="text-xl mr-2">${isCorrectDomain ? '✓' : '✗'}</span>
+                            <span>Domain Check: ${isCorrectDomain ? 'PASS' : 'FAIL'}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 ml-7">Current domain: ${currentDomain}</p>
+                        <p class="text-sm text-gray-600 ml-7">Expected: mindvault.fit or www.mindvault.fit</p>
+                    </div>
+                `;
+
+                // Test 2: Check HTTPS
+                const isHTTPS = window.location.protocol === 'https:';
+                const httpsResult = document.createElement('div');
+                httpsResult.className = `flex items-center ${isHTTPS ? 'text-green-600' : 'text-yellow-600'}`;
+                httpsResult.innerHTML = `
+                    <span class="text-xl mr-2">${isHTTPS ? '✓' : '⚠'}</span>
+                    <span>HTTPS Check: ${isHTTPS ? 'PASS' : 'WARNING'}</span>
+                `;
+                resultsDiv.appendChild(httpsResult);
+
+                // Test 3: Check if page loaded from GitHub Pages
+                const isGitHubPages = window.location.hostname.includes('github.io') || 
+                                      window.location.hostname === 'mindvault.fit' ||
+                                      window.location.hostname === 'www.mindvault.fit';
+                
+                const githubResult = document.createElement('div');
+                githubResult.className = `flex items-center ${isGitHubPages ? 'text-green-600' : 'text-yellow-600'}`;
+                githubResult.innerHTML = `
+                    <span class="text-xl mr-2">${isGitHubPages ? '✓' : '⚠'}</span>
+                    <span>GitHub Pages Check: ${isGitHubPages ? 'PASS' : 'CHECKING'}</span>
+                `;
+                resultsDiv.appendChild(githubResult);
+
+                // Add recommendations
+                const recommendationsDiv = document.createElement('div');
+                recommendationsDiv.className = 'mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg';
+                recommendationsDiv.innerHTML = `
+                    <h3 class="font-semibold text-blue-900 mb-2">Next Steps:</h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm text-blue-800">
+                        <li>Verify DNS records in GoDaddy match the table above</li>
+                        <li>Wait 24-48 hours for DNS propagation</li>
+                        <li>Check DNS propagation status at dnschecker.org</li>
+                        <li>Verify GitHub Pages custom domain is set to mindvault.fit</li>
+                        <li>Clear browser cache and try again</li>
+                    </ul>
+                `;
+                resultsDiv.appendChild(recommendationsDiv);
+
+                // Add status message
+                if (isCorrectDomain && isHTTPS) {
+                    statusDiv.innerHTML = `
+                        <div class="p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                            ✓ DNS configuration looks correct! If you're still seeing errors, wait for DNS propagation (24-48 hours).
+                        </div>
+                    `;
+                } else if (!isCorrectDomain) {
+                    statusDiv.innerHTML = `
+                        <div class="p-4 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded-lg">
+                            ⚠ You're not on the mindvault.fit domain yet. DNS may still be propagating. Check your GoDaddy DNS settings.
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                        ✗ Error running DNS test: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            setTimeout(runDNSTest, 1000);
+        });
+    </script>
+</body>
+</html>
