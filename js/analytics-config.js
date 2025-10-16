@@ -4,7 +4,7 @@
 class MindVaultAnalytics {
     constructor() {
         this.initialized = false;
-        this.gaTrackingId = null;
+        this.gaTrackingId = 'G-V1ZZ3VLV2L';
         this.userId = null;
         this.sessionId = null;
         this.debugMode = false;

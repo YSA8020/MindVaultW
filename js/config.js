@@ -87,7 +87,7 @@ const CONFIG = {
     // Analytics Configuration
     analytics: {
         // Google Analytics (if enabled)
-        gaTrackingId: null, // Set your GA4 tracking ID here (e.g., 'G-XXXXXXXXXX')
+        gaTrackingId: 'G-V1ZZ3VLV2L', // Your GA4 tracking ID
         
         // Custom analytics
         trackUserActions: true,
