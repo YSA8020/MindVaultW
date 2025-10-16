@@ -36,25 +36,9 @@ DROP VIEW IF EXISTS error_stats CASCADE;
 DROP VIEW IF EXISTS user_activity_stats CASCADE;
 DROP VIEW IF EXISTS user_journey CASCADE;
 
--- Drop existing policies (simplified to avoid any UUID/TEXT issues)
--- Note: This will drop all policies on all tables - we'll recreate them below
-DO $$ 
-DECLARE
-    r RECORD;
-BEGIN
-    -- Drop policies from pg_policies view
-    FOR r IN (SELECT tablename, policyname
-              FROM pg_policies
-              WHERE schemaname = 'public')
-    LOOP
-        BEGIN
-            EXECUTE format('DROP POLICY IF EXISTS %I ON %I', r.policyname, r.tablename);
-        EXCEPTION WHEN OTHERS THEN
-            -- Ignore errors and continue
-            NULL;
-        END;
-    END LOOP;
-END $$;
+-- Note: We're not dropping policies here to avoid UUID/TEXT issues with pg_policies view
+-- If you get "policy already exists" errors, you'll need to drop them manually or
+-- run the script on a fresh database
 
 -- ============================================================================
 -- PART 1: Core User Tables
