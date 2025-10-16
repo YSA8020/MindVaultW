@@ -10,6 +10,7 @@
 -- ============================================================================
 
 -- Drop existing functions (using CASCADE to handle all dependencies)
+-- This will drop ALL functions in the public schema to ensure clean slate
 DO $$ 
 DECLARE
     r RECORD;
@@ -19,25 +20,14 @@ BEGIN
                      '(' || pg_get_function_arguments(p.oid) || ') CASCADE' as drop_cmd
               FROM pg_proc p
               JOIN pg_namespace n ON p.pronamespace = n.oid
-              WHERE n.nspname = 'public'
-              AND p.proname IN (
-                  'cleanup_old_error_logs',
-                  'cleanup_old_activity_logs',
-                  'cleanup_old_rate_limits',
-                  'cleanup_old_failed_logins',
-                  'cleanup_old_security_events',
-                  'check_rate_limit',
-                  'log_failed_login',
-                  'log_security_event',
-                  'initialize_professional_onboarding',
-                  'update_onboarding_progress',
-                  'get_onboarding_status',
-                  'get_professional_dashboard_stats',
-                  'get_upcoming_sessions',
-                  'get_professional_clients'
-              ))
+              WHERE n.nspname = 'public')
     LOOP
-        EXECUTE r.drop_cmd;
+        BEGIN
+            EXECUTE r.drop_cmd;
+        EXCEPTION WHEN OTHERS THEN
+            -- Ignore errors and continue
+            RAISE NOTICE 'Could not drop function: %', r.drop_cmd;
+        END;
     END LOOP;
 END $$;
 
