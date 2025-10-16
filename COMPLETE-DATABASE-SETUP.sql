@@ -6,6 +6,31 @@
 -- ============================================================================
 
 -- ============================================================================
+-- CLEANUP: Drop existing functions and views (if any)
+-- ============================================================================
+
+-- Drop existing functions
+DROP FUNCTION IF EXISTS cleanup_old_error_logs() CASCADE;
+DROP FUNCTION IF EXISTS cleanup_old_activity_logs() CASCADE;
+DROP FUNCTION IF EXISTS cleanup_old_rate_limits() CASCADE;
+DROP FUNCTION IF EXISTS cleanup_old_failed_logins() CASCADE;
+DROP FUNCTION IF EXISTS cleanup_old_security_events() CASCADE;
+DROP FUNCTION IF EXISTS check_rate_limit(TEXT, TEXT, TEXT, INTEGER, INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS log_failed_login(TEXT, TEXT, TEXT, TEXT) CASCADE;
+DROP FUNCTION IF EXISTS log_security_event(TEXT, TEXT, TEXT, TEXT, BOOLEAN, TEXT, JSONB) CASCADE;
+DROP FUNCTION IF EXISTS initialize_professional_onboarding(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS update_onboarding_progress(TEXT, TEXT) CASCADE;
+DROP FUNCTION IF EXISTS get_onboarding_status(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS get_professional_dashboard_stats(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS get_upcoming_sessions(TEXT, INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS get_professional_clients(TEXT, TEXT) CASCADE;
+
+-- Drop existing views
+DROP VIEW IF EXISTS error_stats CASCADE;
+DROP VIEW IF EXISTS user_activity_stats CASCADE;
+DROP VIEW IF EXISTS user_journey CASCADE;
+
+-- ============================================================================
 -- PART 1: Core User Tables
 -- ============================================================================
 
