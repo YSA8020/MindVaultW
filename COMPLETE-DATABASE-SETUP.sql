@@ -443,24 +443,26 @@ BEGIN
     v_window_start := DATE_TRUNC('hour', NOW());
     v_window_end := v_window_start + (p_window_minutes || ' minutes')::INTERVAL;
     
-    -- Get or create rate limit record
-    INSERT INTO rate_limits (user_id, ip_address, endpoint, window_start, window_end)
-    VALUES (p_user_id, p_ip_address, p_endpoint, v_window_start, v_window_end)
-    ON CONFLICT DO NOTHING;
-    
     -- Get current count
     SELECT request_count INTO v_current_count
     FROM rate_limits
-    WHERE (user_id = p_user_id OR ip_address = p_ip_address)
+    WHERE (user_id = p_user_id OR (user_id IS NULL AND ip_address = p_ip_address))
     AND endpoint = p_endpoint
     AND window_start = v_window_start;
+    
+    -- If no record exists, create one
+    IF v_current_count IS NULL THEN
+        INSERT INTO rate_limits (user_id, ip_address, endpoint, window_start, window_end, request_count)
+        VALUES (p_user_id, p_ip_address, p_endpoint, v_window_start, v_window_end, 1);
+        v_current_count := 1;
+    END IF;
     
     -- Check if limit exceeded
     IF v_current_count >= p_max_requests THEN
         UPDATE rate_limits
         SET blocked = TRUE,
             blocked_until = NOW() + INTERVAL '1 hour'
-        WHERE (user_id = p_user_id OR ip_address = p_ip_address)
+        WHERE (user_id = p_user_id OR (user_id IS NULL AND ip_address = p_ip_address))
         AND endpoint = p_endpoint
         AND window_start = v_window_start;
         
@@ -472,7 +474,7 @@ BEGIN
     UPDATE rate_limits
     SET request_count = request_count + 1,
         updated_at = NOW()
-    WHERE (user_id = p_user_id OR ip_address = p_ip_address)
+    WHERE (user_id = p_user_id OR (user_id IS NULL AND ip_address = p_ip_address))
     AND endpoint = p_endpoint
     AND window_start = v_window_start;
     
