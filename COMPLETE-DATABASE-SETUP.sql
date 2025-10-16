@@ -17,9 +17,9 @@ DECLARE
 BEGIN
     -- Drop all functions that might exist
     FOR r IN (SELECT 'DROP FUNCTION IF EXISTS ' || n.nspname || '.' || p.proname || 
-                     '(' || pg_get_function_arguments(p.oid) || ') CASCADE' as drop_cmd
-              FROM pg_proc p
-              JOIN pg_namespace n ON p.pronamespace = n.oid
+                     '(' || pg_catalog.pg_get_function_arguments(p.oid) || ') CASCADE' as drop_cmd
+              FROM pg_catalog.pg_proc p
+              JOIN pg_catalog.pg_namespace n ON p.pronamespace = n.oid
               WHERE n.nspname = 'public')
     LOOP
         BEGIN
