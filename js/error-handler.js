@@ -237,16 +237,37 @@ class MindVaultErrorHandler {
     }
 
     async sendErrorsToServer(errors) {
-        // This would send errors to your error reporting service
-        // For now, we'll just log them
-        console.log('Sending errors to server:', errors.length, 'errors');
-        
-        // Example: Send to your backend API
-        // await fetch('/api/errors', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify({ errors })
-        // });
+        try {
+            // Send errors to Supabase for logging
+            if (window.supabaseClient) {
+                const { data, error } = await window.supabaseClient
+                    .from('error_logs')
+                    .insert(errors.map(error => ({
+                        error_id: error.id,
+                        type: error.type,
+                        message: error.message,
+                        severity: error.severity,
+                        stack_trace: error.stack,
+                        context: error.context,
+                        user_id: error.userId,
+                        session_id: error.sessionId,
+                        url: error.url,
+                        user_agent: error.userAgent,
+                        timestamp: error.timestamp,
+                        filename: error.filename,
+                        line_number: error.lineno,
+                        column_number: error.colno
+                    })));
+                
+                if (error) {
+                    console.error('Failed to log errors to Supabase:', error);
+                } else {
+                    console.log('Successfully logged', errors.length, 'errors to Supabase');
+                }
+            }
+        } catch (error) {
+            console.error('Failed to send errors to server:', error);
+        }
     }
 
     generateErrorId() {

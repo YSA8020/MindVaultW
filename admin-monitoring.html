@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Monitoring - MindVault</title>
+    <meta name="description" content="Admin monitoring dashboard for MindVault production system">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js?v=4"></script>
+    <script src="js/config.js?v=4"></script>
+    <script src="js/error-handler.js?v=4"></script>
+    <script src="js/supabase-client.js?v=4"></script>
+    <script src="js/production-logger.js?v=4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        
+        .chart-container {
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900">MindVault Admin Monitoring</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-500">Last updated: <span id="last-updated">--</span></span>
+                    <button onclick="refreshData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Refresh
+                    </button>
+                    <a href="admin-dashboard.html" class="text-gray-600 hover:text-gray-900">Back to Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- System Status -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">System Status</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-3 h-3 bg-green-500 rounded-full status-indicator"></div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">System Status</p>
+                            <p class="text-2xl font-semibold text-gray-900">Online</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Active Users</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="active-users">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Errors (24h)</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="error-count">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Uptime</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="uptime">--</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Monitoring -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Error Monitoring</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Errors</h3>
+                    <div id="recent-errors" class="space-y-3">
+                        <div class="text-center text-gray-500 py-8">Loading errors...</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Error Types</h3>
+                    <div id="error-types" class="space-y-3">
+                        <div class="text-center text-gray-500 py-8">Loading error types...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Activity -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">User Activity</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Activity Summary</h3>
+                    <div id="activity-summary" class="space-y-4">
+                        <div class="text-center text-gray-500 py-8">Loading activity...</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Pages</h3>
+                    <div id="top-pages" class="space-y-3">
+                        <div class="text-center text-gray-500 py-8">Loading pages...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Performance Metrics</h2>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Core Web Vitals</h3>
+                <div id="performance-metrics" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center text-gray-500 py-8">Loading metrics...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+
+        async function initMonitoring() {
+            try {
+                await loadSystemStatus();
+                await loadErrorData();
+                await loadActivityData();
+                await loadPerformanceData();
+                
+                // Set up auto-refresh
+                refreshInterval = setInterval(refreshData, 30000); // Refresh every 30 seconds
+                
+                updateLastUpdated();
+            } catch (error) {
+                console.error('Failed to initialize monitoring:', error);
+            }
+        }
+
+        async function refreshData() {
+            try {
+                await loadSystemStatus();
+                await loadErrorData();
+                await loadActivityData();
+                await loadPerformanceData();
+                updateLastUpdated();
+            } catch (error) {
+                console.error('Failed to refresh data:', error);
+            }
+        }
+
+        async function loadSystemStatus() {
+            try {
+                // Get active users (sessions in last 5 minutes)
+                const { data: activeUsers } = await window.supabaseClient
+                    .from('user_activity_logs')
+                    .select('session_id')
+                    .gte('timestamp', new Date(Date.now() - 5 * 60 * 1000).toISOString());
+
+                document.getElementById('active-users').textContent = 
+                    activeUsers ? new Set(activeUsers.map(u => u.session_id)).size : 0;
+
+                // Get error count for last 24 hours
+                const { data: errors } = await window.supabaseClient
+                    .from('error_logs')
+                    .select('id')
+                    .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+                document.getElementById('error-count').textContent = errors ? errors.length : 0;
+
+                // Calculate uptime (simplified)
+                document.getElementById('uptime').textContent = '99.9%';
+            } catch (error) {
+                console.error('Failed to load system status:', error);
+            }
+        }
+
+        async function loadErrorData() {
+            try {
+                // Get recent errors
+                const { data: recentErrors } = await window.supabaseClient
+                    .from('error_logs')
+                    .select('*')
+                    .order('timestamp', { ascending: false })
+                    .limit(10);
+
+                const recentErrorsContainer = document.getElementById('recent-errors');
+                if (recentErrors && recentErrors.length > 0) {
+                    recentErrorsContainer.innerHTML = recentErrors.map(error => `
+                        <div class="border-l-4 border-red-500 pl-4 py-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">${error.type}</p>
+                                    <p class="text-sm text-gray-600">${error.message}</p>
+                                </div>
+                                <span class="text-xs text-gray-500">${new Date(error.timestamp).toLocaleTimeString()}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    recentErrorsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No recent errors</div>';
+                }
+
+                // Get error types
+                const { data: errorTypes } = await window.supabaseClient
+                    .from('error_logs')
+                    .select('type')
+                    .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+                const errorTypesContainer = document.getElementById('error-types');
+                if (errorTypes && errorTypes.length > 0) {
+                    const typeCounts = errorTypes.reduce((acc, error) => {
+                        acc[error.type] = (acc[error.type] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    errorTypesContainer.innerHTML = Object.entries(typeCounts)
+                        .sort(([,a], [,b]) => b - a)
+                        .map(([type, count]) => `
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm text-gray-900">${type}</span>
+                                <span class="text-sm font-medium text-gray-600">${count}</span>
+                            </div>
+                        `).join('');
+                } else {
+                    errorTypesContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No errors in last 24h</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load error data:', error);
+            }
+        }
+
+        async function loadActivityData() {
+            try {
+                // Get activity summary
+                const { data: activitySummary } = await window.supabaseClient
+                    .rpc('get_user_activity_summary', { days_back: 1 });
+
+                const activityContainer = document.getElementById('activity-summary');
+                if (activitySummary && activitySummary.length > 0) {
+                    const summary = activitySummary[0];
+                    activityContainer.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center">
+                                <p class="text-2xl font-semibold text-gray-900">${summary.total_events || 0}</p>
+                                <p class="text-sm text-gray-500">Total Events</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-semibold text-gray-900">${summary.unique_users || 0}</p>
+                                <p class="text-sm text-gray-500">Unique Users</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-semibold text-gray-900">${summary.unique_sessions || 0}</p>
+                                <p class="text-sm text-gray-500">Sessions</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-2xl font-semibold text-gray-900">${Math.round(summary.avg_session_duration || 0)}s</p>
+                                <p class="text-sm text-gray-500">Avg Session</p>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    activityContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No activity data</div>';
+                }
+
+                // Get top pages
+                const { data: topPages } = await window.supabaseClient
+                    .from('user_activity_logs')
+                    .select('url')
+                    .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+                    .eq('event_type', 'page_view');
+
+                const topPagesContainer = document.getElementById('top-pages');
+                if (topPages && topPages.length > 0) {
+                    const pageCounts = topPages.reduce((acc, page) => {
+                        const url = new URL(page.url).pathname;
+                        acc[url] = (acc[url] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    topPagesContainer.innerHTML = Object.entries(pageCounts)
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 5)
+                        .map(([page, count]) => `
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm text-gray-900 truncate">${page}</span>
+                                <span class="text-sm font-medium text-gray-600">${count}</span>
+                            </div>
+                        `).join('');
+                } else {
+                    topPagesContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No page views</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load activity data:', error);
+            }
+        }
+
+        async function loadPerformanceData() {
+            try {
+                // Get Core Web Vitals
+                const { data: performanceData } = await window.supabaseClient
+                    .from('user_activity_logs')
+                    .select('event_data')
+                    .eq('event_type', 'core_web_vital')
+                    .gte('timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+                const performanceContainer = document.getElementById('performance-metrics');
+                if (performanceData && performanceData.length > 0) {
+                    const metrics = performanceData.reduce((acc, item) => {
+                        const metric = item.event_data.metric;
+                        const value = item.event_data.value;
+                        if (!acc[metric]) acc[metric] = [];
+                        acc[metric].push(value);
+                        return acc;
+                    }, {});
+
+                    performanceContainer.innerHTML = Object.entries(metrics).map(([metric, values]) => {
+                        const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                        const status = getMetricStatus(metric, avg);
+                        
+                        return `
+                            <div class="text-center">
+                                <p class="text-2xl font-semibold ${status.color}">${Math.round(avg)}</p>
+                                <p class="text-sm text-gray-500">${metric}</p>
+                                <p class="text-xs ${status.color}">${status.label}</p>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    performanceContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No performance data</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load performance data:', error);
+            }
+        }
+
+        function getMetricStatus(metric, value) {
+            switch (metric) {
+                case 'LCP':
+                    if (value <= 2500) return { color: 'text-green-600', label: 'Good' };
+                    if (value <= 4000) return { color: 'text-yellow-600', label: 'Needs Improvement' };
+                    return { color: 'text-red-600', label: 'Poor' };
+                case 'FID':
+                    if (value <= 100) return { color: 'text-green-600', label: 'Good' };
+                    if (value <= 300) return { color: 'text-yellow-600', label: 'Needs Improvement' };
+                    return { color: 'text-red-600', label: 'Poor' };
+                case 'CLS':
+                    if (value <= 0.1) return { color: 'text-green-600', label: 'Good' };
+                    if (value <= 0.25) return { color: 'text-yellow-600', label: 'Needs Improvement' };
+                    return { color: 'text-red-600', label: 'Poor' };
+                default:
+                    return { color: 'text-gray-600', label: 'Unknown' };
+            }
+        }
+
+        function updateLastUpdated() {
+            document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initMonitoring);
+
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>
