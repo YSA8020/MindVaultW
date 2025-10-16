@@ -15,14 +15,22 @@ DROP FUNCTION IF EXISTS cleanup_old_activity_logs() CASCADE;
 DROP FUNCTION IF EXISTS cleanup_old_rate_limits() CASCADE;
 DROP FUNCTION IF EXISTS cleanup_old_failed_logins() CASCADE;
 DROP FUNCTION IF EXISTS cleanup_old_security_events() CASCADE;
+DROP FUNCTION IF EXISTS check_rate_limit(UUID, TEXT, TEXT, INTEGER, INTEGER) CASCADE;
 DROP FUNCTION IF EXISTS check_rate_limit(TEXT, TEXT, TEXT, INTEGER, INTEGER) CASCADE;
 DROP FUNCTION IF EXISTS log_failed_login(TEXT, TEXT, TEXT, TEXT) CASCADE;
+DROP FUNCTION IF EXISTS log_security_event(UUID, TEXT, TEXT, TEXT, BOOLEAN, TEXT, JSONB) CASCADE;
 DROP FUNCTION IF EXISTS log_security_event(TEXT, TEXT, TEXT, TEXT, BOOLEAN, TEXT, JSONB) CASCADE;
+DROP FUNCTION IF EXISTS initialize_professional_onboarding(UUID) CASCADE;
 DROP FUNCTION IF EXISTS initialize_professional_onboarding(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS update_onboarding_progress(UUID, TEXT) CASCADE;
 DROP FUNCTION IF EXISTS update_onboarding_progress(TEXT, TEXT) CASCADE;
+DROP FUNCTION IF EXISTS get_onboarding_status(UUID) CASCADE;
 DROP FUNCTION IF EXISTS get_onboarding_status(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS get_professional_dashboard_stats(UUID) CASCADE;
 DROP FUNCTION IF EXISTS get_professional_dashboard_stats(TEXT) CASCADE;
+DROP FUNCTION IF EXISTS get_upcoming_sessions(UUID, INTEGER) CASCADE;
 DROP FUNCTION IF EXISTS get_upcoming_sessions(TEXT, INTEGER) CASCADE;
+DROP FUNCTION IF EXISTS get_professional_clients(UUID, TEXT) CASCADE;
 DROP FUNCTION IF EXISTS get_professional_clients(TEXT, TEXT) CASCADE;
 
 -- Drop existing views
@@ -401,7 +409,7 @@ CREATE POLICY "Admins can view all security events" ON security_events
 
 -- Rate limiting function
 CREATE OR REPLACE FUNCTION check_rate_limit(
-    p_user_id TEXT,
+    p_user_id UUID,
     p_ip_address TEXT,
     p_endpoint TEXT,
     p_max_requests INTEGER DEFAULT 60,
@@ -503,7 +511,7 @@ $$ LANGUAGE plpgsql;
 
 -- Security event logging function
 CREATE OR REPLACE FUNCTION log_security_event(
-    p_user_id TEXT,
+    p_user_id UUID,
     p_event_type TEXT,
     p_ip_address TEXT,
     p_user_agent TEXT,
@@ -683,7 +691,7 @@ CREATE POLICY "Public can view onboarding resources" ON onboarding_resources
     FOR SELECT USING (true);
 
 -- Onboarding functions
-CREATE OR REPLACE FUNCTION initialize_professional_onboarding(p_user_id TEXT)
+CREATE OR REPLACE FUNCTION initialize_professional_onboarding(p_user_id UUID)
 RETURNS VOID AS $$
 BEGIN
     INSERT INTO onboarding_progress (user_id, current_stage, stage_completed)
@@ -708,7 +716,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION update_onboarding_progress(
-    p_user_id TEXT,
+    p_user_id UUID,
     p_stage TEXT
 )
 RETURNS TABLE (
@@ -772,7 +780,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_onboarding_status(p_user_id TEXT)
+CREATE OR REPLACE FUNCTION get_onboarding_status(p_user_id UUID)
 RETURNS TABLE (
     current_stage TEXT,
     completion_percentage INTEGER,
@@ -1047,7 +1055,7 @@ CREATE POLICY "Professionals can view own analytics" ON professional_analytics
     FOR ALL USING (auth.uid() = professional_id);
 
 -- Professional dashboard functions
-CREATE OR REPLACE FUNCTION get_professional_dashboard_stats(p_professional_id TEXT)
+CREATE OR REPLACE FUNCTION get_professional_dashboard_stats(p_professional_id UUID)
 RETURNS TABLE (
     total_clients INTEGER,
     active_clients INTEGER,
@@ -1077,7 +1085,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_upcoming_sessions(p_professional_id TEXT, p_limit INTEGER DEFAULT 10)
+CREATE OR REPLACE FUNCTION get_upcoming_sessions(p_professional_id UUID, p_limit INTEGER DEFAULT 10)
 RETURNS TABLE (
     session_id BIGINT,
     client_name TEXT,
@@ -1105,7 +1113,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION get_professional_clients(p_professional_id TEXT, p_status TEXT DEFAULT 'active')
+CREATE OR REPLACE FUNCTION get_professional_clients(p_professional_id UUID, p_status TEXT DEFAULT 'active')
 RETURNS TABLE (
     client_id TEXT,
     client_name TEXT,
