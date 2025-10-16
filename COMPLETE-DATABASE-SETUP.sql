@@ -1168,19 +1168,19 @@ GRANT ALL ON professional_availability TO anon, authenticated;
 GRANT ALL ON professional_analytics TO anon, authenticated;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
 
--- Grant execute permissions on all functions
-GRANT EXECUTE ON FUNCTION check_rate_limit TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION log_failed_login TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION log_security_event TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION cleanup_old_rate_limits TO authenticated;
-GRANT EXECUTE ON FUNCTION cleanup_old_failed_logins TO authenticated;
-GRANT EXECUTE ON FUNCTION cleanup_old_security_events TO authenticated;
-GRANT EXECUTE ON FUNCTION initialize_professional_onboarding TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION update_onboarding_progress TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION get_onboarding_status TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION get_professional_dashboard_stats TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION get_upcoming_sessions TO anon, authenticated;
-GRANT EXECUTE ON FUNCTION get_professional_clients TO anon, authenticated;
+-- Grant execute permissions on all functions (with full signatures)
+GRANT EXECUTE ON FUNCTION check_rate_limit(UUID, TEXT, TEXT, INTEGER, INTEGER) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION log_failed_login(TEXT, TEXT, TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION log_security_event(UUID, TEXT, TEXT, TEXT, BOOLEAN, TEXT, JSONB) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION cleanup_old_rate_limits() TO authenticated;
+GRANT EXECUTE ON FUNCTION cleanup_old_failed_logins() TO authenticated;
+GRANT EXECUTE ON FUNCTION cleanup_old_security_events() TO authenticated;
+GRANT EXECUTE ON FUNCTION initialize_professional_onboarding(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION update_onboarding_progress(UUID, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_onboarding_status(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_professional_dashboard_stats(UUID) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_upcoming_sessions(UUID, INTEGER) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION get_professional_clients(UUID, TEXT) TO anon, authenticated;
 
 -- ============================================================================
 -- SETUP COMPLETE!
