@@ -1117,7 +1117,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION get_professional_clients(p_professional_id UUID, p_status TEXT DEFAULT 'active')
 RETURNS TABLE (
-    client_id TEXT,
+    client_id UUID,
     client_name TEXT,
     client_email TEXT,
     relationship_status TEXT,
