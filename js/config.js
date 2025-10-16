@@ -87,13 +87,33 @@ const CONFIG = {
     // Analytics Configuration
     analytics: {
         // Google Analytics (if enabled)
-        googleAnalyticsId: null, // Set your GA4 ID here
+        gaTrackingId: null, // Set your GA4 tracking ID here (e.g., 'G-XXXXXXXXXX')
         
         // Custom analytics
         trackUserActions: true,
         trackPageViews: true,
         trackErrors: true,
-        trackPerformance: true
+        trackPerformance: true,
+        trackConversions: true,
+        trackEcommerce: true,
+        
+        // Custom dimensions (GA4)
+        customDimensions: {
+            userType: 1,        // 'user', 'professional', 'admin'
+            subscriptionPlan: 2, // 'basic', 'premium', 'professional'
+            licenseType: 3,     // For professionals
+            supportGroup: 4,    // User's support group
+            experienceLevel: 5  // User's experience level
+        },
+        
+        // Event categories
+        eventCategories: {
+            user: 'user_interaction',
+            professional: 'professional_action',
+            system: 'system_event',
+            error: 'error_event',
+            performance: 'performance_metric'
+        }
     },
     
     // Error Reporting

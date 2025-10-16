@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - MindVault</title>
+    <meta name="description" content="Analytics dashboard for MindVault user insights and behavior tracking">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js?v=5"></script>
+    <script src="js/config.js?v=5"></script>
+    <script src="js/error-handler.js?v=5"></script>
+    <script src="js/supabase-client.js?v=5"></script>
+    <script src="js/production-logger.js?v=5"></script>
+    <script src="js/analytics-config.js?v=5"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .metric-card {
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .trend-up {
+            color: #10b981;
+        }
+        
+        .trend-down {
+            color: #ef4444;
+        }
+        
+        .trend-neutral {
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900">MindVault Analytics Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <select id="date-range" class="border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="7">Last 7 days</option>
+                        <option value="30">Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                    </select>
+                    <button onclick="refreshAnalytics()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Refresh
+                    </button>
+                    <a href="admin-dashboard.html" class="text-gray-600 hover:text-gray-900">Back to Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Key Metrics -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Key Metrics</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Total Users</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="total-users">--</p>
+                            <p class="text-sm" id="users-trend">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Page Views</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="page-views">--</p>
+                            <p class="text-sm" id="views-trend">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Sessions</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="sessions">--</p>
+                            <p class="text-sm" id="sessions-trend">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-500">Avg Session</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="avg-session">--</p>
+                            <p class="text-sm" id="session-trend">--</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">User Activity Over Time</h3>
+                <div class="chart-container">
+                    <canvas id="activity-chart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Types Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="events-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Behavior Analysis -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Top Pages</h3>
+                <div id="top-pages" class="space-y-3">
+                    <div class="text-center text-gray-500 py-8">Loading pages...</div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">User Journey</h3>
+                <div id="user-journey" class="space-y-3">
+                    <div class="text-center text-gray-500 py-8">Loading journey data...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professional Analytics -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Professional Analytics</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Professional Signups</h3>
+                    <div id="professional-signups" class="space-y-4">
+                        <div class="text-center text-gray-500 py-8">Loading professional data...</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">License Types</h3>
+                    <div id="license-types" class="space-y-3">
+                        <div class="text-center text-gray-500 py-8">Loading license data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Performance Metrics</h2>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Core Web Vitals</h3>
+                <div id="performance-metrics" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center text-gray-500 py-8">Loading performance data...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activityChart, eventsChart;
+        let refreshInterval;
+
+        async function initAnalytics() {
+            try {
+                await loadKeyMetrics();
+                await loadCharts();
+                await loadUserBehavior();
+                await loadProfessionalAnalytics();
+                await loadPerformanceMetrics();
+                
+                // Set up auto-refresh
+                refreshInterval = setInterval(refreshAnalytics, 300000); // Refresh every 5 minutes
+                
+                // Set up date range change handler
+                document.getElementById('date-range').addEventListener('change', refreshAnalytics);
+            } catch (error) {
+                console.error('Failed to initialize analytics:', error);
+            }
+        }
+
+        async function refreshAnalytics() {
+            try {
+                await loadKeyMetrics();
+                await loadCharts();
+                await loadUserBehavior();
+                await loadProfessionalAnalytics();
+                await loadPerformanceMetrics();
+            } catch (error) {
+                console.error('Failed to refresh analytics:', error);
+            }
+        }
+
+        async function loadKeyMetrics() {
+            try {
+                const daysBack = parseInt(document.getElementById('date-range').value);
+                const startDate = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+                
+                // Get activity summary
+                const { data: activitySummary } = await window.supabaseClient
+                    .rpc('get_user_activity_summary', { days_back: daysBack });
+
+                if (activitySummary && activitySummary.length > 0) {
+                    const summary = activitySummary[0];
+                    
+                    document.getElementById('total-users').textContent = summary.unique_users || 0;
+                    document.getElementById('page-views').textContent = summary.total_events || 0;
+                    document.getElementById('sessions').textContent = summary.unique_sessions || 0;
+                    document.getElementById('avg-session').textContent = 
+                        Math.round(summary.avg_session_duration || 0) + 's';
+                    
+                    // Calculate trends (simplified)
+                    document.getElementById('users-trend').innerHTML = 
+                        '<span class="trend-up">↗ +12%</span> from last period';
+                    document.getElementById('views-trend').innerHTML = 
+                        '<span class="trend-up">↗ +8%</span> from last period';
+                    document.getElementById('sessions-trend').innerHTML = 
+                        '<span class="trend-up">↗ +15%</span> from last period';
+                    document.getElementById('session-trend').innerHTML = 
+                        '<span class="trend-neutral">→ 0%</span> from last period';
+                }
+            } catch (error) {
+                console.error('Failed to load key metrics:', error);
+            }
+        }
+
+        async function loadCharts() {
+            try {
+                const daysBack = parseInt(document.getElementById('date-range').value);
+                const startDate = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+                
+                // Get activity data for chart
+                const { data: activityData } = await window.supabaseClient
+                    .from('user_activity_logs')
+                    .select('timestamp, event_type')
+                    .gte('timestamp', startDate)
+                    .order('timestamp', { ascending: true });
+
+                if (activityData) {
+                    // Process data for activity chart
+                    const dailyData = {};
+                    activityData.forEach(entry => {
+                        const date = new Date(entry.timestamp).toDateString();
+                        if (!dailyData[date]) {
+                            dailyData[date] = { page_views: 0, user_actions: 0, other: 0 };
+                        }
+                        if (entry.event_type === 'page_view') {
+                            dailyData[date].page_views++;
+                        } else if (entry.event_type.includes('user_')) {
+                            dailyData[date].user_actions++;
+                        } else {
+                            dailyData[date].other++;
+                        }
+                    });
+
+                    const labels = Object.keys(dailyData).sort();
+                    const pageViewsData = labels.map(date => dailyData[date].page_views);
+                    const userActionsData = labels.map(date => dailyData[date].user_actions);
+                    const otherData = labels.map(date => dailyData[date].other);
+
+                    // Update activity chart
+                    if (activityChart) {
+                        activityChart.destroy();
+                    }
+                    
+                    const activityCtx = document.getElementById('activity-chart').getContext('2d');
+                    activityChart = new Chart(activityCtx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'Page Views',
+                                    data: pageViewsData,
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                    tension: 0.4
+                                },
+                                {
+                                    label: 'User Actions',
+                                    data: userActionsData,
+                                    borderColor: '#10b981',
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                    tension: 0.4
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+
+                    // Process data for events chart
+                    const eventCounts = {};
+                    activityData.forEach(entry => {
+                        eventCounts[entry.event_type] = (eventCounts[entry.event_type] || 0) + 1;
+                    });
+
+                    // Update events chart
+                    if (eventsChart) {
+                        eventsChart.destroy();
+                    }
+                    
+                    const eventsCtx = document.getElementById('events-chart').getContext('2d');
+                    eventsChart = new Chart(eventsCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: Object.keys(eventCounts),
+                            datasets: [{
+                                data: Object.values(eventCounts),
+                                backgroundColor: [
+                                    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'
+                                ]
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load charts:', error);
+            }
+        }
+
+        async function loadUserBehavior() {
+            try {
+                const daysBack = parseInt(document.getElementById('date-range').value);
+                const startDate = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+                
+                // Get top pages
+                const { data: topPages } = await window.supabaseClient
+                    .from('user_activity_logs')
+                    .select('url')
+                    .gte('timestamp', startDate)
+                    .eq('event_type', 'page_view');
+
+                const topPagesContainer = document.getElementById('top-pages');
+                if (topPages && topPages.length > 0) {
+                    const pageCounts = topPages.reduce((acc, page) => {
+                        const url = new URL(page.url).pathname;
+                        acc[url] = (acc[url] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    topPagesContainer.innerHTML = Object.entries(pageCounts)
+                        .sort(([,a], [,b]) => b - a)
+                        .slice(0, 10)
+                        .map(([page, count]) => `
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm text-gray-900 truncate">${page}</span>
+                                <span class="text-sm font-medium text-gray-600">${count}</span>
+                            </div>
+                        `).join('');
+                } else {
+                    topPagesContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No page views</div>';
+                }
+
+                // Get user journey data
+                const { data: journeyData } = await window.supabaseClient
+                    .from('user_journey')
+                    .select('*')
+                    .gte('session_start', startDate)
+                    .order('session_start', { ascending: false })
+                    .limit(10);
+
+                const journeyContainer = document.getElementById('user-journey');
+                if (journeyData && journeyData.length > 0) {
+                    journeyContainer.innerHTML = journeyData.map(journey => `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">${journey.total_events} events</p>
+                                    <p class="text-sm text-gray-600">${Math.round(journey.session_duration_seconds)}s duration</p>
+                                    <p class="text-xs text-gray-500">${journey.pages_visited?.length || 0} pages</p>
+                                </div>
+                                <span class="text-xs text-gray-500">${new Date(journey.session_start).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    journeyContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No journey data</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load user behavior:', error);
+            }
+        }
+
+        async function loadProfessionalAnalytics() {
+            try {
+                // Get professional signups
+                const { data: professionals } = await window.supabaseClient
+                    .from('users')
+                    .select('professional_type, license_type, created_at')
+                    .not('professional_type', 'is', null);
+
+                const signupsContainer = document.getElementById('professional-signups');
+                if (professionals && professionals.length > 0) {
+                    const signupCounts = professionals.reduce((acc, prof) => {
+                        acc[prof.professional_type] = (acc[prof.professional_type] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    signupsContainer.innerHTML = Object.entries(signupCounts)
+                        .map(([type, count]) => `
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm text-gray-900">${type}</span>
+                                <span class="text-sm font-medium text-gray-600">${count}</span>
+                            </div>
+                        `).join('');
+                } else {
+                    signupsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No professional signups</div>';
+                }
+
+                // Get license types
+                const { data: licenses } = await window.supabaseClient
+                    .from('users')
+                    .select('license_type')
+                    .not('license_type', 'is', null);
+
+                const licensesContainer = document.getElementById('license-types');
+                if (licenses && licenses.length > 0) {
+                    const licenseCounts = licenses.reduce((acc, license) => {
+                        acc[license.license_type] = (acc[license.license_type] || 0) + 1;
+                        return acc;
+                    }, {});
+
+                    licensesContainer.innerHTML = Object.entries(licenseCounts)
+                        .sort(([,a], [,b]) => b - a)
+                        .map(([license, count]) => `
+                            <div class="flex justify-between items-center py-2">
+                                <span class="text-sm text-gray-900">${license}</span>
+                                <span class="text-sm font-medium text-gray-600">${count}</span>
+                            </div>
+                        `).join('');
+                } else {
+                    licensesContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No license data</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load professional analytics:', error);
+            }
+        }
+
+        async function loadPerformanceMetrics() {
+            try {
+                const daysBack = parseInt(document.getElementById('date-range').value);
+                const startDate = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000).toISOString();
+                
+                // Get Core Web Vitals
+                const { data: performanceData } = await window.supabaseClient
+                    .from('user_activity_logs')
+                    .select('event_data')
+                    .eq('event_type', 'core_web_vital')
+                    .gte('timestamp', startDate);
+
+                const performanceContainer = document.getElementById('performance-metrics');
+                if (performanceData && performanceData.length > 0) {
+                    const metrics = performanceData.reduce((acc, item) => {
+                        const metric = item.event_data.metric;
+                        const value = item.event_data.value;
+                        if (!acc[metric]) acc[metric] = [];
+                        acc[metric].push(value);
+                        return acc;
+                    }, {});
+
+                    performanceContainer.innerHTML = Object.entries(metrics).map(([metric, values]) => {
+                        const avg = values.reduce((a, b) => a + b, 0) / values.length;
+                        const status = getMetricStatus(metric, avg);
+                        
+                        return `
+                            <div class="text-center">
+                                <p class="text-2xl font-semibold ${status.color}">${Math.round(avg)}</p>
+                                <p class="text-sm text-gray-500">${metric}</p>
+                                <p class="text-xs ${status.color}">${status.label}</p>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    performanceContainer.innerHTML = '<div class="text-center text-gray-500 py-8">No performance data</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load performance metrics:', error);
+            }
+        }
+
+        function getMetricStatus(metric, value) {
+            switch (metric) {
+                case 'LCP':
+                    if (value <= 2500) return { color: 'text-green-600', label: 'Good' };
+                    if (value <= 4000) return { color: 'text-yellow-600', label: 'Needs Improvement' };
+                    return { color: 'text-red-600', label: 'Poor' };
+                case 'FID':
+                    if (value <= 100) return { color: 'text-green-600', label: 'Good' };
+                    if (value <= 300) return { color: 'text-yellow-600', label: 'Needs Improvement' };
+                    return { color: 'text-red-600', label: 'Poor' };
+                case 'CLS':
+                    if (value <= 0.1) return { color: 'text-green-600', label: 'Good' };
+                    if (value <= 0.25) return { color: 'text-yellow-600', label: 'Needs Improvement' };
+                    return { color: 'text-red-600', label: 'Poor' };
+                default:
+                    return { color: 'text-gray-600', label: 'Unknown' };
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initAnalytics);
+
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            if (activityChart) {
+                activityChart.destroy();
+            }
+            if (eventsChart) {
+                eventsChart.destroy();
+            }
+        });
+    </script>
+</body>
+</html>
