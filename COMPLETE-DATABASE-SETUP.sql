@@ -36,6 +36,20 @@ DROP VIEW IF EXISTS error_stats CASCADE;
 DROP VIEW IF EXISTS user_activity_stats CASCADE;
 DROP VIEW IF EXISTS user_journey CASCADE;
 
+-- Drop existing policies
+DO $$ 
+DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT schemaname, tablename, policyname
+              FROM pg_policies
+              WHERE schemaname = 'public')
+    LOOP
+        EXECUTE 'DROP POLICY IF EXISTS ' || quote_ident(r.policyname) || 
+                ' ON ' || quote_ident(r.schemaname) || '.' || quote_ident(r.tablename);
+    END LOOP;
+END $$;
+
 -- ============================================================================
 -- PART 1: Core User Tables
 -- ============================================================================
@@ -90,12 +104,15 @@ CREATE INDEX IF NOT EXISTS idx_users_verification_status ON users(verification_s
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users
+DROP POLICY IF EXISTS "Users can view own profile" ON users;
 CREATE POLICY "Users can view own profile" ON users
     FOR SELECT USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON users;
 CREATE POLICY "Users can update own profile" ON users
     FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON users;
 CREATE POLICY "Users can insert own profile" ON users
     FOR INSERT WITH CHECK (auth.uid() = id);
 
@@ -130,6 +147,7 @@ CREATE INDEX IF NOT EXISTS idx_error_logs_timestamp ON error_logs(timestamp);
 
 ALTER TABLE error_logs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Admins can view all error logs" ON error_logs;
 CREATE POLICY "Admins can view all error logs" ON error_logs
     FOR ALL USING (
         EXISTS (
