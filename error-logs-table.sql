@@ -45,10 +45,11 @@ SELECT
     severity,
     COUNT(*) as error_count,
     DATE_TRUNC('hour', timestamp) as hour,
-    DATE_TRUNC('day', timestamp) as day
+    DATE_TRUNC('day', timestamp) as day,
+    MAX(timestamp) as latest_timestamp
 FROM error_logs
 GROUP BY type, severity, DATE_TRUNC('hour', timestamp), DATE_TRUNC('day', timestamp)
-ORDER BY timestamp DESC;
+ORDER BY latest_timestamp DESC;
 
 -- Create a function to clean up old error logs (older than 30 days)
 CREATE OR REPLACE FUNCTION cleanup_old_error_logs()

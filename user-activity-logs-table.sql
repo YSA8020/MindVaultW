@@ -42,10 +42,11 @@ SELECT
     COUNT(DISTINCT user_id) as unique_users,
     COUNT(DISTINCT session_id) as unique_sessions,
     DATE_TRUNC('hour', timestamp) as hour,
-    DATE_TRUNC('day', timestamp) as day
+    DATE_TRUNC('day', timestamp) as day,
+    MAX(timestamp) as latest_timestamp
 FROM user_activity_logs
 GROUP BY event_type, DATE_TRUNC('hour', timestamp), DATE_TRUNC('day', timestamp)
-ORDER BY timestamp DESC;
+ORDER BY latest_timestamp DESC;
 
 -- Create a view for user journey analysis
 CREATE OR REPLACE VIEW user_journey AS
