@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Security Dashboard - MindVault</title>
+    <meta name="description" content="Security monitoring and threat detection dashboard">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js?v=9"></script>
+    <script src="js/config.js?v=9"></script>
+    <script src="js/error-handler.js?v=9"></script>
+    <script src="js/supabase-client.js?v=9"></script>
+    <script src="js/rate-limiter.js?v=9"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .security-card {
+            transition: all 0.3s ease;
+        }
+        
+        .security-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .threat-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-xl font-semibold text-gray-900">Security Dashboard</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="refreshSecurityData()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Refresh
+                    </button>
+                    <a href="admin-dashboard.html" class="text-gray-600 hover:text-gray-900">Back to Admin</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Security Overview -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Security Overview</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="security-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">System Status</p>
+                            <p class="text-2xl font-semibold text-gray-900">Secure</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="security-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Active Threats</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="active-threats">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="security-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Blocked IPs</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="blocked-ips">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="security-card bg-white p-6 rounded-lg shadow">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Failed Logins (24h)</p>
+                            <p class="text-2xl font-semibold text-gray-900" id="failed-logins">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suspicious Activity -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">🚨 Suspicious Activity</h2>
+            <div id="suspicious-activity" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">Loading suspicious activity...</div>
+            </div>
+        </div>
+
+        <!-- Failed Login Attempts -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Failed Login Attempts</h2>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="failed-logins-table" class="bg-white divide-y divide-gray-200">
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Loading failed logins...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- IP Blacklist -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">IP Blacklist</h2>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-900">Blocked IP Addresses</h3>
+                    <button onclick="showAddIPModal()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                        Block IP Address
+                    </button>
+                </div>
+                <div id="ip-blacklist" class="space-y-3">
+                    <div class="text-center text-gray-500 py-8">Loading blacklist...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Events -->
+        <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Recent Security Events</h2>
+            <div id="security-events" class="space-y-4">
+                <div class="text-center text-gray-500 py-8">Loading security events...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add IP to Blacklist Modal -->
+    <div id="add-ip-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen">
+            <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Block IP Address</h3>
+                <form id="block-ip-form">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">IP Address</label>
+                        <input 
+                            type="text" 
+                            id="block-ip-address" 
+                            placeholder="192.168.1.1" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            required
+                        >
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Reason</label>
+                        <textarea 
+                            id="block-ip-reason" 
+                            rows="3" 
+                            placeholder="Reason for blocking..." 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                id="permanent-block" 
+                                class="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                            >
+                            <span class="ml-2 text-sm text-gray-700">Permanent block</span>
+                        </label>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button 
+                            type="submit" 
+                            class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                            Block IP
+                        </button>
+                        <button 
+                            type="button" 
+                            onclick="hideAddIPModal()" 
+                            class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+
+        async function initSecurityDashboard() {
+            try {
+                await loadSecurityOverview();
+                await loadSuspiciousActivity();
+                await loadFailedLogins();
+                await loadIPBlacklist();
+                await loadSecurityEvents();
+                
+                // Set up auto-refresh
+                refreshInterval = setInterval(refreshSecurityData, 30000); // Refresh every 30 seconds
+                
+                // Set up form handler
+                document.getElementById('block-ip-form').addEventListener('submit', handleBlockIP);
+            } catch (error) {
+                console.error('Failed to initialize security dashboard:', error);
+            }
+        }
+
+        async function refreshSecurityData() {
+            try {
+                await loadSecurityOverview();
+                await loadSuspiciousActivity();
+                await loadFailedLogins();
+                await loadIPBlacklist();
+                await loadSecurityEvents();
+            } catch (error) {
+                console.error('Failed to refresh security data:', error);
+            }
+        }
+
+        async function loadSecurityOverview() {
+            try {
+                // Get suspicious activity count
+                const { data: suspicious } = await window.supabaseClient
+                    .from('suspicious_activity')
+                    .select('id')
+                    .eq('resolved', false);
+
+                document.getElementById('active-threats').textContent = suspicious ? suspicious.length : 0;
+
+                // Get blocked IPs count
+                const { data: blocked } = await window.supabaseClient
+                    .from('ip_blacklist')
+                    .select('id')
+                    .or('permanent.eq.true,blocked_until.gt.' + new Date().toISOString());
+
+                document.getElementById('blocked-ips').textContent = blocked ? blocked.length : 0;
+
+                // Get failed logins count (24h)
+                const { data: failedLogins } = await window.supabaseClient
+                    .from('failed_login_attempts')
+                    .select('id')
+                    .eq('success', false)
+                    .gte('attempted_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+                document.getElementById('failed-logins').textContent = failedLogins ? failedLogins.length : 0;
+            } catch (error) {
+                console.error('Failed to load security overview:', error);
+            }
+        }
+
+        async function loadSuspiciousActivity() {
+            try {
+                const { data: activity, error } = await window.supabaseClient
+                    .from('suspicious_activity')
+                    .select('*')
+                    .eq('resolved', false)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('suspicious-activity');
+                
+                if (activity && activity.length > 0) {
+                    container.innerHTML = activity.map(item => `
+                        <div class="security-card bg-white rounded-lg shadow p-6 ${item.severity === 'critical' ? 'threat-indicator' : ''}">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="px-3 py-1 text-sm font-semibold rounded-full ${getSeverityColor(item.severity)}">
+                                            ${item.severity.toUpperCase()}
+                                        </span>
+                                        <span class="text-sm text-gray-500">${item.activity_type}</span>
+                                    </div>
+                                    <p class="text-gray-800 mb-2">${item.description}</p>
+                                    <div class="text-sm text-gray-500">
+                                        <p>IP: ${item.ip_address || 'Unknown'}</p>
+                                        <p>User: ${item.user_id ? item.user_id.substring(0, 8) + '...' : 'Unknown'}</p>
+                                        <p>Time: ${formatTime(item.created_at)}</p>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="resolveActivity('${item.id}')" class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                        Resolve
+                                    </button>
+                                    <button onclick="blockIPFromActivity('${item.ip_address}')" class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">
+                                        Block IP
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No suspicious activity detected</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load suspicious activity:', error);
+            }
+        }
+
+        async function loadFailedLogins() {
+            try {
+                const { data: logins, error } = await window.supabaseClient
+                    .from('failed_login_attempts')
+                    .select('*')
+                    .order('attempted_at', { ascending: false })
+                    .limit(20);
+
+                if (error) throw error;
+
+                const tableBody = document.getElementById('failed-logins-table');
+                
+                if (logins && logins.length > 0) {
+                    tableBody.innerHTML = logins.map(login => `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${formatTime(login.attempted_at)}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                ${login.email || 'Unknown'}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${login.ip_address}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${login.failure_reason || 'Incorrect credentials'}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="blockIP('${login.ip_address}')" class="text-red-600 hover:text-red-900">
+                                    Block IP
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">No failed login attempts</td></tr>';
+                }
+            } catch (error) {
+                console.error('Failed to load failed logins:', error);
+            }
+        }
+
+        async function loadIPBlacklist() {
+            try {
+                const { data: blacklist, error } = await window.supabaseClient
+                    .from('ip_blacklist')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('ip-blacklist');
+                
+                if (blacklist && blacklist.length > 0) {
+                    container.innerHTML = blacklist.map(ip => `
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <div>
+                                <p class="font-semibold text-gray-900">${ip.ip_address}</p>
+                                <p class="text-sm text-gray-500">${ip.reason}</p>
+                                <p class="text-xs text-gray-400">Blocked ${formatTime(ip.created_at)}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full ${ip.permanent ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    ${ip.permanent ? 'Permanent' : 'Temporary'}
+                                </span>
+                                <button onclick="unblockIP('${ip.ip_address}')" class="text-blue-600 hover:text-blue-800">
+                                    Unblock
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No blocked IP addresses</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load IP blacklist:', error);
+            }
+        }
+
+        async function loadSecurityEvents() {
+            try {
+                const { data: events, error } = await window.supabaseClient
+                    .from('security_events')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (error) throw error;
+
+                const container = document.getElementById('security-events');
+                
+                if (events && events.length > 0) {
+                    container.innerHTML = events.map(event => `
+                        <div class="security-card bg-white rounded-lg shadow p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${event.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                            ${event.success ? 'Success' : 'Failed'}
+                                        </span>
+                                        <span class="text-sm font-semibold text-gray-900">${event.event_type}</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">${event.failure_reason || 'Event completed successfully'}</p>
+                                    <p class="text-xs text-gray-500 mt-1">IP: ${event.ip_address || 'Unknown'} • ${formatTime(event.created_at)}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<div class="text-center text-gray-500 py-8">No security events</div>';
+                }
+            } catch (error) {
+                console.error('Failed to load security events:', error);
+            }
+        }
+
+        async function handleBlockIP(e) {
+            e.preventDefault();
+            
+            try {
+                const ipAddress = document.getElementById('block-ip-address').value;
+                const reason = document.getElementById('block-ip-reason').value;
+                const permanent = document.getElementById('permanent-block').checked;
+
+                const { data, error } = await window.supabaseClient
+                    .from('ip_blacklist')
+                    .insert([{
+                        ip_address: ipAddress,
+                        reason: reason,
+                        blocked_by: 'admin',
+                        permanent: permanent
+                    }]);
+
+                if (error) throw error;
+
+                hideAddIPModal();
+                await loadIPBlacklist();
+                await loadSecurityOverview();
+                
+                alert('IP address blocked successfully');
+            } catch (error) {
+                console.error('Failed to block IP:', error);
+                alert('Failed to block IP address');
+            }
+        }
+
+        async function unblockIP(ipAddress) {
+            if (!confirm(`Are you sure you want to unblock ${ipAddress}?`)) {
+                return;
+            }
+
+            try {
+                const { error } = await window.supabaseClient
+                    .from('ip_blacklist')
+                    .delete()
+                    .eq('ip_address', ipAddress);
+
+                if (error) throw error;
+
+                await loadIPBlacklist();
+                await loadSecurityOverview();
+                
+                alert('IP address unblocked successfully');
+            } catch (error) {
+                console.error('Failed to unblock IP:', error);
+                alert('Failed to unblock IP address');
+            }
+        }
+
+        async function resolveActivity(activityId) {
+            try {
+                const { error } = await window.supabaseClient
+                    .from('suspicious_activity')
+                    .update({
+                        resolved: true,
+                        resolved_at: new Date().toISOString()
+                    })
+                    .eq('id', activityId);
+
+                if (error) throw error;
+
+                await loadSuspiciousActivity();
+                await loadSecurityOverview();
+            } catch (error) {
+                console.error('Failed to resolve activity:', error);
+            }
+        }
+
+        async function blockIPFromActivity(ipAddress) {
+            if (!ipAddress) {
+                alert('No IP address available');
+                return;
+            }
+
+            document.getElementById('block-ip-address').value = ipAddress;
+            document.getElementById('block-ip-reason').value = 'Blocked due to suspicious activity';
+            showAddIPModal();
+        }
+
+        function showAddIPModal() {
+            document.getElementById('add-ip-modal').classList.remove('hidden');
+        }
+
+        function hideAddIPModal() {
+            document.getElementById('add-ip-modal').classList.add('hidden');
+            document.getElementById('block-ip-form').reset();
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'Just now';
+            if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+            if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+            return `${Math.floor(diff / 86400000)}d ago`;
+        }
+
+        function getSeverityColor(severity) {
+            const colors = {
+                'critical': 'bg-red-100 text-red-800',
+                'high': 'bg-orange-100 text-orange-800',
+                'medium': 'bg-yellow-100 text-yellow-800',
+                'low': 'bg-blue-100 text-blue-800'
+            };
+            return colors[severity] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initSecurityDashboard);
+
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+        });
+    </script>
+</body>
+</html>
