@@ -60,13 +60,13 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for users
 CREATE POLICY "Users can view own profile" ON users
-    FOR SELECT USING (auth.uid()::text = id);
+    FOR SELECT USING (auth.uid() = id::uuid);
 
 CREATE POLICY "Users can update own profile" ON users
-    FOR UPDATE USING (auth.uid()::text = id);
+    FOR UPDATE USING (auth.uid() = id::uuid);
 
 CREATE POLICY "Users can insert own profile" ON users
-    FOR INSERT WITH CHECK (auth.uid()::text = id);
+    FOR INSERT WITH CHECK (auth.uid() = id::uuid);
 
 -- ============================================================================
 -- PART 2: Error Logging System
@@ -103,7 +103,7 @@ CREATE POLICY "Admins can view all error logs" ON error_logs
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id = auth.uid()::text 
+            WHERE users.id::uuid = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -159,7 +159,7 @@ CREATE INDEX IF NOT EXISTS idx_user_activity_logs_timestamp ON user_activity_log
 ALTER TABLE user_activity_logs ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view own activity" ON user_activity_logs
-    FOR SELECT USING (auth.uid()::text = user_id);
+    FOR SELECT USING (auth.uid() = user_id::uuid);
 
 -- Activity stats view
 CREATE OR REPLACE VIEW user_activity_stats AS
@@ -321,19 +321,19 @@ ALTER TABLE security_events ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 CREATE POLICY "Users can view own security settings" ON user_security_settings
-    FOR SELECT USING (auth.uid()::text = user_id);
+    FOR SELECT USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can update own security settings" ON user_security_settings
-    FOR UPDATE USING (auth.uid()::text = user_id);
+    FOR UPDATE USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can view own security events" ON security_events
-    FOR SELECT USING (auth.uid()::text = user_id);
+    FOR SELECT USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Admins can view all security data" ON rate_limits
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id = auth.uid()::text 
+            WHERE users.id::uuid = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -342,7 +342,7 @@ CREATE POLICY "Admins can view all failed login attempts" ON failed_login_attemp
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id = auth.uid()::text 
+            WHERE users.id::uuid = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -351,7 +351,7 @@ CREATE POLICY "Admins can view all suspicious activity" ON suspicious_activity
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id = auth.uid()::text 
+            WHERE users.id::uuid = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -360,7 +360,7 @@ CREATE POLICY "Admins can manage IP blacklist" ON ip_blacklist
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id = auth.uid()::text 
+            WHERE users.id::uuid = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -369,7 +369,7 @@ CREATE POLICY "Admins can view all security events" ON security_events
     FOR ALL USING (
         EXISTS (
             SELECT 1 FROM users 
-            WHERE users.id = auth.uid()::text 
+            WHERE users.id::uuid = auth.uid() 
             AND users.user_type = 'admin'
         )
     );
@@ -634,25 +634,25 @@ ALTER TABLE onboarding_resources ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 CREATE POLICY "Users can view own onboarding progress" ON onboarding_progress
-    FOR SELECT USING (auth.uid()::text = user_id);
+    FOR SELECT USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can update own onboarding progress" ON onboarding_progress
-    FOR UPDATE USING (auth.uid()::text = user_id);
+    FOR UPDATE USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can insert own onboarding progress" ON onboarding_progress
-    FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can view own professional profile" ON professional_profiles
-    FOR SELECT USING (auth.uid()::text = user_id);
+    FOR SELECT USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can update own professional profile" ON professional_profiles
-    FOR UPDATE USING (auth.uid()::text = user_id);
+    FOR UPDATE USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can insert own professional profile" ON professional_profiles
-    FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+    FOR INSERT WITH CHECK (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Users can view own onboarding checkpoints" ON onboarding_checkpoints
-    FOR ALL USING (auth.uid()::text = user_id);
+    FOR ALL USING (auth.uid() = user_id::uuid);
 
 CREATE POLICY "Public can view onboarding resources" ON onboarding_resources
     FOR SELECT USING (true);
@@ -986,40 +986,40 @@ ALTER TABLE professional_analytics ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 CREATE POLICY "Professionals can view own client relationships" ON client_professional_relationships
-    FOR SELECT USING (auth.uid()::text = professional_id);
+    FOR SELECT USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Professionals can manage own client relationships" ON client_professional_relationships
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Clients can view own relationships" ON client_professional_relationships
-    FOR SELECT USING (auth.uid()::text = client_id);
+    FOR SELECT USING (auth.uid() = client_id::uuid);
 
 CREATE POLICY "Professionals can view own sessions" ON sessions
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Clients can view own sessions" ON sessions
-    FOR SELECT USING (auth.uid()::text = client_id);
+    FOR SELECT USING (auth.uid() = client_id::uuid);
 
 CREATE POLICY "Professionals can view own treatment plans" ON treatment_plans
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Clients can view own treatment plans" ON treatment_plans
-    FOR SELECT USING (auth.uid()::text = client_id);
+    FOR SELECT USING (auth.uid() = client_id::uuid);
 
 CREATE POLICY "Professionals can view own assessments" ON client_assessments
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Clients can view own assessments" ON client_assessments
-    FOR SELECT USING (auth.uid()::text = client_id);
+    FOR SELECT USING (auth.uid() = client_id::uuid);
 
 CREATE POLICY "Professionals can view own notes" ON client_notes
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Professionals can manage own availability" ON professional_availability
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 CREATE POLICY "Professionals can view own analytics" ON professional_analytics
-    FOR ALL USING (auth.uid()::text = professional_id);
+    FOR ALL USING (auth.uid() = professional_id::uuid);
 
 -- Professional dashboard functions
 CREATE OR REPLACE FUNCTION get_professional_dashboard_stats(p_professional_id TEXT)
