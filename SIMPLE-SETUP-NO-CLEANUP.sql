@@ -321,6 +321,8 @@ CREATE TABLE IF NOT EXISTS onboarding_progress (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS idx_onboarding_progress_professional ON onboarding_progress(professional_id);
+
 CREATE TABLE IF NOT EXISTS onboarding_checkpoints (
     id BIGSERIAL PRIMARY KEY,
     professional_id UUID REFERENCES users(id) ON DELETE CASCADE,
