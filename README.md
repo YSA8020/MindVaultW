@@ -1,140 +1,275 @@
-# MindVault Website
+# MindVault - Your Mental Health Companion
 
-A modern, responsive website for MindVault - Your Mental Health Companion.
+<div align="center">
 
-## Features
+![MindVault](public/assets/mindvault-icon.svg)
 
-- 🎨 **Modern Design**: Clean, professional interface with smooth animations
-- 📱 **Responsive**: Works perfectly on desktop, tablet, and mobile
-- ⚡ **Fast Performance**: Built with Next.js for optimal speed
-- 🎯 **Interactive Demo**: Hands-on experience of MindVault features
-- 📧 **Contact Form**: Easy way for users to get in touch
-- 🔍 **SEO Optimized**: Proper meta tags and structured data
+**A modern, production-ready mental health platform built with Next.js, TypeScript, and Supabase.**
 
-## Tech Stack
+[![Next.js](https://img.shields.io/badge/Next.js-14.0-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Latest-green)](https://supabase.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-- **Framework**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Icons**: Lucide React
-- **Deployment**: Vercel/Netlify ready
+[Features](#features) • [Quick Start](#quick-start) • [Documentation](#documentation) • [Deployment](#deployment)
 
-## Getting Started
+</div>
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+---
 
-2. **Run development server**:
-   ```bash
-   npm run dev
-   ```
+## 🌟 Features
 
-3. **Open your browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000)
+### For Users
+- 🎯 **Mood Tracking** - Daily mood logging with insights
+- 💬 **Anonymous Sharing** - Safe space to share thoughts
+- 🤖 **AI Insights** - Personalized mental health insights
+- 👥 **Peer Support** - Connect with others on similar journeys
+- 📊 **Progress Tracking** - Visualize your mental health journey
+- 🆘 **Crisis Support** - Immediate help resources
+- 🌙 **Dark Mode** - Easy on the eyes, day or night
 
-## Project Structure
+### For Professionals
+- 📋 **Client Management** - Organize and track clients
+- 📅 **Session Scheduling** - Manage appointments
+- 📝 **Treatment Planning** - Create and update plans
+- 📈 **Analytics Dashboard** - Track practice metrics
+- ✅ **Professional Verification** - Credential verification
+- 💼 **Profile Management** - Showcase specializations
+
+### For Admins
+- 📊 **Analytics** - System-wide metrics
+- 🔒 **Security Dashboard** - Monitor threats
+- 💾 **Backup Management** - Data protection
+- 👤 **User Management** - System administration
+- 🚨 **Emergency Response** - Crisis intervention tools
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm 9+
+- Supabase account (free tier works!)
+- Git
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/mindvault.git
+cd mindvault
+
+# Install dependencies
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your Supabase credentials
+
+# Run development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) 🎉
+
+**📖 For detailed setup instructions, see [SETUP-GUIDE.md](SETUP-GUIDE.md)**
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [SETUP-GUIDE.md](SETUP-GUIDE.md) | Complete installation and setup instructions |
+| [REFACTORING-SUMMARY.md](REFACTORING-SUMMARY.md) | Project structure and architecture overview |
+| [DATABASE-MIGRATION-GUIDE.md](DATABASE-MIGRATION-GUIDE.md) | Database setup and migration guide |
+| [docs/](docs/) | Comprehensive feature documentation |
+
+## 🏗️ Tech Stack
+
+### Frontend
+- **Framework:** Next.js 14 with TypeScript
+- **Styling:** Tailwind CSS
+- **Animations:** Framer Motion
+- **Icons:** Lucide React
+- **State Management:** React Hooks
+
+### Backend
+- **Database:** PostgreSQL (via Supabase)
+- **Authentication:** Supabase Auth
+- **Real-time:** Supabase Realtime
+- **Storage:** Supabase Storage
+- **Row Level Security:** Enabled on all tables
+
+### Development
+- **Language:** TypeScript
+- **Linting:** ESLint
+- **Formatting:** Prettier (recommended)
+- **Type Checking:** TypeScript Compiler
+
+## 📁 Project Structure
 
 ```
-src/
-├── pages/
-│   ├── index.tsx          # Landing page
-│   ├── demo.tsx           # Interactive demo
-│   ├── _app.tsx           # App wrapper
-│   └── _document.tsx     # Document wrapper
-├── styles/
-│   └── globals.css        # Global styles
-└── components/            # Reusable components (future)
+mindvault/
+├── src/
+│   ├── components/          # React components
+│   │   ├── layout/         # Layout components
+│   │   ├── auth/           # Authentication components
+│   │   └── dashboard/      # Dashboard components
+│   ├── lib/                # Utilities and services
+│   │   ├── supabase.ts    # Supabase client
+│   │   ├── auth.ts        # Auth manager
+│   │   └── config.ts      # Configuration
+│   ├── hooks/              # Custom React hooks
+│   │   └── useAuth.ts     # Authentication hook
+│   ├── pages/              # Next.js pages (routes)
+│   │   ├── index.tsx      # Landing page
+│   │   ├── login.tsx      # Login page
+│   │   ├── signup.tsx     # Signup page
+│   │   └── dashboard.tsx  # User dashboard
+│   ├── types/              # TypeScript type definitions
+│   └── styles/             # Global styles
+├── public/
+│   └── assets/             # Static assets (images, icons)
+├── database/
+│   ├── migrations/         # Database migrations
+│   ├── schemas/            # Database schemas
+│   └── seeds/              # Seed data
+├── docs/                   # Documentation
+└── tests/                  # Test files
 ```
 
-## Pages
+## 🔐 Security
 
-### Landing Page (`/`)
-- Hero section with compelling messaging
-- Features showcase
-- Statistics and social proof
-- About section
-- Contact form
-- Footer with links
+- **Row Level Security (RLS)** enabled on all tables
+- **Authentication** via Supabase Auth
+- **Environment variables** for sensitive data
+- **Rate limiting** on critical endpoints
+- **Input validation** on all forms
+- **HTTPS only** in production
 
-### Demo Page (`/demo`)
-- Interactive step-by-step experience
-- Mood selection
-- Thought sharing
-- AI response simulation
-- Feature previews
+## 🧪 Testing
 
-## Customization
+```bash
+# Run tests
+npm test
 
-### Colors
-The website uses a custom color palette defined in `tailwind.config.js`:
-- Primary: Indigo shades
-- Accent: Blue gradients
-- Neutral: Gray scale
+# Type checking
+npm run type-check
 
-### Content
-- Update text content in the respective page files
-- Modify contact information in the contact section
-- Add your own images and branding
+# Linting
+npm run lint
+```
 
-### Styling
-- Global styles in `src/styles/globals.css`
-- Component-specific styles using Tailwind classes
-- Custom animations and transitions
+## 📦 Deployment
 
-## Deployment
+### Vercel (Recommended for Next.js)
 
-### Vercel (Recommended)
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Deploy automatically
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy to production
+vercel --prod
+
+# Or use npm script
+npm run deploy:vercel
+```
 
 ### Netlify
-1. Build the project: `npm run build`
-2. Upload the `out` folder to Netlify
-3. Configure redirects for SPA routing
 
-### Other Platforms
-The website is static and can be deployed to any hosting service that supports HTML/CSS/JS.
+```bash
+# Install Netlify CLI
+npm i -g netlify-cli
 
-## SEO Features
+# Deploy to production
+netlify deploy --prod
 
-- Meta tags for social sharing
-- Open Graph tags for Facebook/LinkedIn
-- Twitter Card tags
-- Structured data markup
-- Semantic HTML structure
-- Fast loading times
+# Or use npm script
+npm run deploy:netlify
+```
 
-## Performance
+### Cloudflare Pages
 
-- Optimized images and assets
-- Minimal JavaScript bundle
-- CSS purging with Tailwind
-- Lazy loading for better UX
-- Responsive images
+Connect your GitHub repository at [dash.cloudflare.com](https://dash.cloudflare.com) for automatic deployments.
 
-## Browser Support
+**📖 For detailed deployment instructions, see [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)**
 
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers
+**Note:** GitHub Pages is not recommended for this Next.js application due to its server-side rendering requirements.
 
-## Contributing
+## 🗃️ Database
+
+The project uses Supabase (PostgreSQL) with:
+
+- **26+ Tables** - Complete schema for all features
+- **13 Functions** - Database operations
+- **3 Views** - Analytics and dashboards
+- **50+ RLS Policies** - Data security
+
+**📖 Setup instructions: [DATABASE-MIGRATION-GUIDE.md](DATABASE-MIGRATION-GUIDE.md)**
+
+## 🎨 Customization
+
+### Branding
+1. Replace logo in `public/assets/`
+2. Update colors in `tailwind.config.js`
+3. Modify content in page files
+
+### Features
+1. Check archived pages in `archive/legacy-html-pages/`
+2. Convert to React using existing patterns
+3. Add routing in `src/pages/`
+
+### Configuration
+- Update `src/lib/config.ts` for app settings
+- Modify `.env.local` for environment-specific values
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🙏 Acknowledgments
 
-For questions or support, please contact us at hello@mindvault.app
+- Next.js team for the amazing framework
+- Supabase for the backend infrastructure
+- Tailwind CSS for the styling system
+- All contributors and supporters
+
+## 📧 Support
+
+- **Email:** hello@mindvault.app
+- **Documentation:** [docs/](docs/)
+- **Issues:** [GitHub Issues](https://github.com/yourusername/mindvault/issues)
+
+## 🗺️ Roadmap
+
+- [ ] Mobile app (React Native)
+- [ ] Video sessions
+- [ ] Group therapy features
+- [ ] Integrated payments
+- [ ] Multi-language support
+- [ ] Advanced analytics
+- [ ] API for third-party integrations
+
+## 📊 Project Status
+
+**Version:** 2.0.0  
+**Status:** ✅ Production Ready  
+**Last Updated:** October 2025
+
+---
+
+<div align="center">
+
+**Built with ❤️ for mental health awareness**
+
+[Website](https://mindvault.fit) • [Documentation](docs/) • [Support](mailto:hello@mindvault.app)
+
+</div>
