@@ -91,7 +91,7 @@ export class AuthManager {
     }
 
     if (professionalFeatures.includes(feature)) {
-      return plan === 'professional' || (trialStatus?.isActive && plan === 'professional');
+      return plan === 'professional' || ((trialStatus?.isActive ?? false) && plan === 'professional');
     }
 
     return false;
