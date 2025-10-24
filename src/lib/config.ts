@@ -173,7 +173,7 @@ export const ConfigUtils = {
   // Check if user has access to feature
   hasFeatureAccess: (userPlan: 'basic' | 'premium' | 'professional', feature: string): boolean => {
     const planConfig = ConfigUtils.getPlanConfig(userPlan);
-    return planConfig.features.includes(feature);
+    return planConfig.features.includes(feature as any);
   },
   
   // Get API endpoint
