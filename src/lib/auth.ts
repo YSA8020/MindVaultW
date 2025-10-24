@@ -92,7 +92,7 @@ export class AuthManager {
     }
 
     if (professionalFeatures.includes(feature)) {
-      return plan === 'professional' || (isTrialActive && plan === 'professional');
+      return plan === 'professional';
     }
 
     return false;
