@@ -168,48 +168,58 @@ const Home: NextPage = () => {
 
           {/* Email Signup */}
           <motion.div
-            className="max-w-md mx-auto"
+            className="max-w-xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.2 }}
           >
             {!isSubscribed ? (
               <>
-                <p className="text-white/80 mb-4 text-lg">
+                <p className="text-white/90 mb-6 text-xl font-medium">
                   Be the first to know when we launch
                 </p>
-                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1 relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <Mail className="absolute left-5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-white/40" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
                       required
-                      className="w-full pl-12 pr-4 py-4 rounded-lg bg-white/10 backdrop-blur-lg border border-white/20 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      className="w-full pl-14 pr-5 py-4 rounded-xl bg-white/15 backdrop-blur-lg border-2 border-white/30 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/60 focus:border-white/50 transition-all text-base"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="px-8 py-4 bg-white text-indigo-900 font-semibold rounded-lg hover:bg-gray-100 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                    className="px-10 py-4 bg-white text-purple-900 font-bold rounded-xl hover:bg-white/95 hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none whitespace-nowrap text-base"
                   >
-                    {isLoading ? 'Joining...' : 'Notify Me'}
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                        </svg>
+                        Joining...
+                      </span>
+                    ) : 'Notify Me'}
                   </button>
                 </form>
               </>
             ) : (
               <motion.div
-                className="bg-white/10 backdrop-blur-lg p-6 rounded-lg"
+                className="bg-white/15 backdrop-blur-lg p-8 rounded-2xl border-2 border-white/30 shadow-2xl"
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
               >
-                <div className="flex items-center justify-center space-x-2 text-white">
-                  <Check className="h-6 w-6 text-green-400" />
-                  <span className="text-lg font-semibold">Thank you for subscribing!</span>
+                <div className="flex items-center justify-center space-x-3 text-white">
+                  <div className="bg-green-400 rounded-full p-1">
+                    <Check className="h-6 w-6 text-white" />
+                  </div>
+                  <span className="text-xl font-bold">Thank you for subscribing!</span>
                 </div>
-                <p className="text-white/70 mt-2">
+                <p className="text-white/80 mt-3 text-center text-base">
                   We'll notify you when MindVault launches.
                 </p>
               </motion.div>
@@ -218,12 +228,12 @@ const Home: NextPage = () => {
 
           {/* Launch Timeline */}
           <motion.div
-            className="mt-16 text-white/60"
+            className="mt-20 text-white/70"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1.4 }}
           >
-            <p className="text-sm">Expected Launch: Q2 2025</p>
+            <p className="text-base font-medium tracking-wide">Expected Launch: Q2 2025</p>
           </motion.div>
 
         </div>
@@ -231,25 +241,34 @@ const Home: NextPage = () => {
 
       {/* Footer */}
       <motion.footer
-        className="absolute bottom-0 w-full py-8 text-center text-white/50"
+        className="absolute bottom-0 w-full py-10 text-center text-white/60"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 1.6 }}
       >
-        <div className="flex items-center justify-center space-x-8 text-sm">
-          <a href="mailto:hello@mindvault.fit" className="hover:text-white/80 transition-colors">
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm mb-5 px-4">
+          <a 
+            href="mailto:hello@mindvault.fit" 
+            className="hover:text-white/90 transition-colors duration-200 font-medium"
+          >
             Contact
           </a>
-          <span>•</span>
-          <a href="#" className="hover:text-white/80 transition-colors">
+          <span className="hidden sm:inline text-white/40">•</span>
+          <a 
+            href="#" 
+            className="hover:text-white/90 transition-colors duration-200 font-medium"
+          >
             Privacy Policy
           </a>
-          <span>•</span>
-          <a href="#" className="hover:text-white/80 transition-colors">
+          <span className="hidden sm:inline text-white/40">•</span>
+          <a 
+            href="#" 
+            className="hover:text-white/90 transition-colors duration-200 font-medium"
+          >
             Terms of Service
           </a>
         </div>
-        <p className="mt-4">&copy; 2024 MindVault. All rights reserved.</p>
+        <p className="text-sm text-white/50">&copy; 2024 MindVault. All rights reserved.</p>
       </motion.footer>
     </div>
   )
