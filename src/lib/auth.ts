@@ -72,6 +72,7 @@ export class AuthManager {
 
     const trialStatus = this.getTrialStatus(user);
     const plan = user.plan;
+    const isTrialActive = trialStatus?.isActive ?? false;
 
     // Basic features available to all users
     const basicFeatures = ['anonymous_sharing', 'mood_tracking', 'ai_insights_basic', 'crisis_support'];
@@ -87,11 +88,11 @@ export class AuthManager {
     }
 
     if (premiumFeatures.includes(feature)) {
-      return plan === 'premium' || plan === 'professional' || (trialStatus?.isActive ?? false);
+      return plan === 'premium' || plan === 'professional' || isTrialActive;
     }
 
     if (professionalFeatures.includes(feature)) {
-      return plan === 'professional' || ((trialStatus?.isActive ?? false) && plan === 'professional');
+      return plan === 'professional' || (isTrialActive && plan === 'professional');
     }
 
     return false;
