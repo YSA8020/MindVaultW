@@ -91,14 +91,8 @@ const Home: NextPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="relative w-32 h-32 sm:w-40 sm:h-40">
-              <Image
-                src="/logo.png"
-                alt="MindVault Logo"
-                fill
-                className="object-contain drop-shadow-2xl"
-                priority
-              />
+            <div className="relative w-32 h-32 sm:w-40 sm:h-40 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl shadow-2xl flex items-center justify-center">
+              <Brain className="w-20 h-20 sm:w-24 sm:h-24 text-white" strokeWidth={1.5} />
             </div>
           </motion.div>
 
