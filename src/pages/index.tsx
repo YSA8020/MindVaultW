@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { 
@@ -90,8 +91,14 @@ const Home: NextPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="bg-white/10 backdrop-blur-lg rounded-full p-6 shadow-2xl">
-              <Brain className="h-16 w-16 text-white" />
+            <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+              <Image
+                src="/logo.png"
+                alt="MindVault Logo"
+                fill
+                className="object-contain drop-shadow-2xl"
+                priority
+              />
             </div>
           </motion.div>
 
